@@ -1,0 +1,62 @@
+<?php
+include "Pedido.php";
+
+
+class Mesa
+{
+    private $codigo_mesa;
+    private $foto_mesa;
+    private $estado_mesa;
+
+    public function CrearPedido()
+    {
+        $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
+
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO mesas(codigo_mesa,estado_mesa) VALUES (:codigo_mesa,:estado_mesa)");
+
+        $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
+        $sql->bindValue(":estado_mesa", $this->estado_mesa, PDO::PARAM_STR);
+
+        $sql->execute();
+    }
+
+    public static function ObtenerTodos()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas");
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+    
+    }
+
+    public static function ObtenerMesa($mesa)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas WHERE mesa = :mesa");
+        $consulta->bindValue(':mesa', $mesa, PDO::PARAM_STR);
+        $consulta->execute();
+
+        return $consulta->fetchObject('Mesa');
+    }
+
+    // public static function modificarMesa($mesa)
+    // {
+    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
+    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET estado_mesa = :estado_mesa WHERE codigo_mesa = :codigo_mesa");
+    //     $consulta->bindValue(":codigo_mesa", $mesa->codigo_mesa);
+    //     $consulta->bindValue(":estado_mesa", $mesa->estado_mesa);
+
+    //     $consulta->execute();
+    // }
+
+    // public static function borrarUsuario($usuario)
+    // {
+    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
+    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id = :id");
+    //     $fecha = new DateTime(date("d-m-Y"));
+    //     $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
+    //     $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+    //     $consulta->execute();
+    // }
+}
