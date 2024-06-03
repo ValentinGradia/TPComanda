@@ -20,10 +20,8 @@ $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
 // Routes
-$app->get('[/]', function (Request $request, Response $response) {
-    //$payload = json_encode(array('method' => 'GET', 'msg' => "Bienvenido a SlimFramework 2023"));
-    $response->getBody()->write("Funciona!!");
-    return $response;
+$app->group("/usuarios", function (Request $request, Response $response){
+
 });
 
 $app->get('/test', function (Request $request, Response $response) {
