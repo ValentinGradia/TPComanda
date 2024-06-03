@@ -2,7 +2,7 @@
 require_once './models/Producto.php';
 require_once './interfaces/IApiUsable.php';
 
-class PedidoController extends Pedido implements IApiUsable
+class ProductoController extends Producto implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {

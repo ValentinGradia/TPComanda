@@ -4,18 +4,21 @@ include "../db/AccesoDatos.php";
 class Usuario
 {
     public $id_usuario;
-    public $codigo_pedido;  
+    public $nombre;
+    public $clave;
     public $rol;
-    public $pendientes = [];
+    //public $ocupado = false;
+    //public $pendientes = [];
 
     public function crearUsuario()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(id_usuario,codigo_pedido,rol) VALUES (:id_usuario,:codigo_pedido,:rol)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(id_usuario,nombre,clave,rol) VALUES (:id_usuario,:nombre,:clave,:rol)");
 
         $sql->bindValue(":id_usuario",$this->id_usuario, PDO::PARAM_INT);
-        $sql->bindValue(":codigo_pedido", $this->codigo_pedido, PDO::PARAM_INT);
+        $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
+        $sql->bindValue(":clave", $this->clave);
         $sql->bindValue(":rol", $this->rol, PDO::PARAM_STR);
 
         $sql->execute();

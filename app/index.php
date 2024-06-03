@@ -20,26 +20,28 @@ $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
 // Routes
-$app->group("/usuarios", function (Request $request, Response $response){
-
+$app->group("/usuarios", function (RouteCollectorProxy $group){
+    $group->get("[/]", \UsuarioController::class . ":TraerTodos");
+    $group->get("/{id_usuario}", \UsuarioController::class . ":TraerUno");
+    $group->post("[/]", \UsuarioController::class . ":CargarUno");
 });
 
-$app->get('/test', function (Request $request, Response $response) {
-    $payload = json_encode(array('method' => 'GET', 'msg' => "Bienvenido a SlimFramework 2023"));
-    $response->getBody()->write($payload);
-    return $response->withHeader('Content-Type', 'application/json');
+$app->group("/productos", function (RouteCollectorProxy $group){
+    $group->get("[/]", \ProductoController::class . ":TraerTodos");
+    $group->get("/{id_producto}", \ProductoController::class . ":TraerUno");
+    $group->post("[/]", \ProductoController::class . ":CargarUno");
 });
 
-$app->post('[/]', function (Request $request, Response $response) {
-    $payload = json_encode(array('method' => 'POST', 'msg' => "Bienvenido a SlimFramework 2023"));
-    $response->getBody()->write($payload);
-    return $response->withHeader('Content-Type', 'application/json');
+$app->group("/pedidos", function (RouteCollectorProxy $group){
+    $group->get("[/]", \PedidoController::class . ":TraerTodos");
+    $group->get("/{codigo_pedido}", \PedidoController::class . ":TraerUno");
+    $group->post("[/]", \PedidoController::class . ":CargarUno");
 });
 
-$app->post('/test', function (Request $request, Response $response) {
-    $payload = json_encode(array('method' => 'POST', 'msg' => "Bienvenido a SlimFramework 2023"));
-    $response->getBody()->write($payload);
-    return $response->withHeader('Content-Type', 'application/json');
+$app->group("/mesas", function (RouteCollectorProxy $group){
+    $group->get("[/]", \MesaController::class . ":TraerTodos");
+    $group->get("/{codigo_mesa}", \MesaController::class . ":TraerUno");
+    $group->post("[/]", \MesaController::class . ":CargarUno");
 });
 
 $app->run();
