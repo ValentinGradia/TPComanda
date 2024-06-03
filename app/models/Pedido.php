@@ -5,15 +5,15 @@ include "Producto.php";
 
 class Pedido 
 {
-    private $codigo_mesa;
-    private $codigo_pedido;
-    private $estado_pedido;
-    private $fecha_inicio_pedido;
-    private $fecha_cierre_pedido;
-    private $nombre_cliente;
-    private $sector;
+    public $codigo_mesa;
+    public $codigo_pedido;
+    public $estado_pedido;
+    public $fecha_inicio_pedido;
+    public $fecha_cierre_pedido;
+    public $nombre_cliente;
+    public $sector;
 
-    public function CrearPedido()
+    public function crearPedido()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
@@ -32,7 +32,7 @@ class Pedido
         $sql->execute();
     }
 
-    public static function ObtenerTodos()
+    public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,fecha_inicio_pedido,nombre_cliente,
@@ -43,7 +43,7 @@ class Pedido
     
     }
 
-    public static function ObtenerPedido($pedido)
+    public static function obtenerPedido($pedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,fecha_inicio_pedido,nombre_cliente,

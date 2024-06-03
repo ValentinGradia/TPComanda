@@ -4,12 +4,11 @@ include "../db/AccesoDatos.php";
 class Usuario
 {
     public $id_usuario;
-    public $codigo_pedido;
-    public $fecha_baja;    
+    public $codigo_pedido;  
     public $rol;
     public $pendientes = [];
 
-    public function CrearUsuario()
+    public function crearUsuario()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
@@ -22,7 +21,7 @@ class Usuario
         $sql->execute();
     }
 
-    public static function ObtenerTodos()
+    public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario, codigo_pedido, rol FROM usuarios");
@@ -32,11 +31,11 @@ class Usuario
     
     }
 
-    public static function ObtenerUsuario($usuario)
+    public static function obtenerUsuario($id_usuario)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario, codigo_pedido, rol FROM usuarios WHERE usuario = :usuario");
-        $consulta->bindValue(':usuario', $usuario, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario, codigo_pedido, rol FROM usuarios WHERE id_usuario = :id_usuario");
+        $consulta->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
         $consulta->execute();
 
         return $consulta->fetchObject('Usuario');

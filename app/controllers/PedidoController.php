@@ -1,21 +1,31 @@
 <?php
-require_once './models/Usuario.php';
+require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 
-class UsuarioController extends Usuario implements IApiUsable
+class MesaController extends Mesa implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
 
-        $id_usuario = $parametros['id_usuario'];
-        $rol = $parametros['rol'];
+        $codigo_mesa = $parametros['codigo_mesa'];
+        $codigo_pedido = $parametros['codigo_pedido'];
+        $estado_pedido = $parametros["estado_pedido"];
+        $fecha_inicio_pedido = $parametros["fecha_inicio_pedido"];
+        $fecha_cierre_pedido = $parametros["fecha_cierre_pedido"];
+        $nombre_cliente = $parametros["nombre_cliente"];
+        $sector = $parametros["sector"]; 
 
-        $usr = new Usuario();
-        $usr->id_usuario = $id_usuario;
-        $usr->rol = $rol;
-        $usr->crearUsuario();
+        $pedido = new Pedido();
+        $pedido->codigo_mesa = $codigo_mesa;
+        $pedido->codigo_pedido = $codigo_pedido;
+        $pedido->estado_pedido = $estado_pedido;
+        $pedido->fecha_inicio_pedido = $fecha_inicio_pedido;
+        $pedido->fecha_cierre_pedido = $fecha_cierre_pedido;
+        $pedido->nombre_cliente = $nombre_cliente;
+        $pedido->sector = $sector;
 
+        $pedido->crearPedido();
         $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -23,9 +33,9 @@ class UsuarioController extends Usuario implements IApiUsable
 
     public function TraerUno($request, $response, $args)
     {
-        $usr = $args['id_usuario'];
-        $usuario = Usuario::obtenerUsuario($usr);
-        $payload = json_encode($usuario);
+        $codigo_mesa = $args['codigo_mesa'];
+        $mesa = Mesa::ObtenerMesa($codigo_mesa);
+        $payload = json_encode($mesa);
 
         $response->getBody()->write($payload);
         return $response
@@ -34,8 +44,8 @@ class UsuarioController extends Usuario implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $lista = Usuario::obtenerTodos();
-        $payload = json_encode(array("listaUsuario" => $lista));
+        $lista = Mesa::obtenerTodos();
+        $payload = json_encode(array("listaMesas" => $lista));
 
         $response->getBody()->write($payload);
         return $response

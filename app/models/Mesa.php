@@ -4,11 +4,11 @@ include "Pedido.php";
 
 class Mesa
 {
-    private $codigo_mesa;
-    private $foto_mesa;
-    private $estado_mesa;
+    public $codigo_mesa;
+    public $foto_mesa;
+    public $estado_mesa;
 
-    public function CrearPedido()
+    public function CrearMesa()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
@@ -30,11 +30,12 @@ class Mesa
     
     }
 
-    public static function ObtenerMesa($mesa)
+    public static function ObtenerMesa($codigo_mesa)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas WHERE mesa = :mesa");
-        $consulta->bindValue(':mesa', $mesa, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas WHERE codigo_mesa = :codigo_mesa");
+        $consulta->bindValue(':codigo_mesa', $codigo_mesa, PDO::PARAM_INT);
+
         $consulta->execute();
 
         return $consulta->fetchObject('Mesa');
