@@ -1,5 +1,5 @@
 <?php
-require_once './models/Pedido.php';
+require_once './models/Producto.php';
 require_once './interfaces/IApiUsable.php';
 
 class PedidoController extends Pedido implements IApiUsable
@@ -8,24 +8,19 @@ class PedidoController extends Pedido implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $codigo_mesa = $parametros['codigo_mesa'];
-        $codigo_pedido = $parametros['codigo_pedido'];
-        $estado_pedido = $parametros["estado_pedido"];
-        $fecha_inicio_pedido = $parametros["fecha_inicio_pedido"];
-        $fecha_cierre_pedido = $parametros["fecha_cierre_pedido"];
-        $nombre_cliente = $parametros["nombre_cliente"];
-        $sector = $parametros["sector"]; 
+        $id_producto = $parametros['id_producto'];
+        $tipo = $parametros['tipo'];
+        $nombre = $parametros["nombre"];
+        $codigo_pedido = $parametros["codigo_pedido"];
 
-        $pedido = new Pedido();
-        $pedido->codigo_mesa = $codigo_mesa;
-        $pedido->codigo_pedido = $codigo_pedido;
-        $pedido->estado_pedido = $estado_pedido;
-        $pedido->fecha_inicio_pedido = $fecha_inicio_pedido;
-        $pedido->fecha_cierre_pedido = $fecha_cierre_pedido;
-        $pedido->nombre_cliente = $nombre_cliente;
-        $pedido->sector = $sector;
+        $producto = new Producto();
+        $producto->id_producto = $id_producto;
+        $producto->tipo = $tipo;
+        $producto->nombre = $nombre;
+        $producto->codigo_pedido = $codigo_pedido;
 
-        $pedido->crearPedido();
+        $producto->CrearProducto();
+
         $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -33,9 +28,9 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerUno($request, $response, $args)
     {
-        $codigo_pedido = $args['codigo_pedido'];
-        $pedido = Pedido::obtenerPedido($codigo_pedido);
-        $payload = json_encode($pedido);
+        $id_producto = $args['id_producto'];
+        $producto = Producto::ObtenerProducto($id_producto);
+        $payload = json_encode($producto);
 
         $response->getBody()->write($payload);
         return $response
@@ -44,8 +39,8 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $lista = Pedido::obtenerTodos();
-        $payload = json_encode(array("listaPedidos" => $lista));
+        $lista = Producto::ObtenerTodos();
+        $payload = json_encode(array("listaProductos" => $lista));
 
         $response->getBody()->write($payload);
         return $response

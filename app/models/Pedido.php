@@ -43,12 +43,12 @@ class Pedido
     
     }
 
-    public static function obtenerPedido($pedido)
+    public static function obtenerPedido($codigo_pedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,fecha_inicio_pedido,nombre_cliente,
-        fecha_cierre_pedido,sector FROM pedidos WHERE pedido = :pedido");
-        $consulta->bindValue(':usuario', $pedido, PDO::PARAM_STR);
+        fecha_cierre_pedido,sector FROM pedidos WHERE codigo_pedido = :codigo_pedido");
+        $consulta->bindValue(':codigo_pedido', $codigo_pedido, PDO::PARAM_INT);
         $consulta->execute();
 
         return $consulta->fetchObject('Pedido');

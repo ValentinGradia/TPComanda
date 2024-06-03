@@ -2,10 +2,10 @@
 
 class Producto
 {
-    private $id_producto;
-    private $tipo;
-    private $nombre;
-    private $codigo_pedido;
+    public $id_producto;
+    public $tipo;
+    public $nombre;
+    public $codigo_pedido;
     //private $precio;
 
     public function CrearProducto()
@@ -31,11 +31,11 @@ class Producto
     
     }
 
-    public static function ObtenerUsuario($producto)
+    public static function ObtenerProducto($id_producto)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,codigo_pedido FROM productos WHERE producto = :producto");
-        $consulta->bindValue(':producto', $producto, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,codigo_pedido FROM productos WHERE id_producto = :id_producto");
+        $consulta->bindValue(':id_producto', $id_producto, PDO::PARAM_STR);
         $consulta->execute();
 
         return $consulta->fetchObject('Producto');
