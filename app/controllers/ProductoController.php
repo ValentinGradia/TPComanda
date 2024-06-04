@@ -8,20 +8,18 @@ class ProductoController extends Producto implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $id_producto = $parametros['id_producto'];
         $tipo = $parametros['tipo'];
         $nombre = $parametros["nombre"];
         $codigo_pedido = $parametros["codigo_pedido"];
 
         $producto = new Producto();
-        $producto->id_producto = $id_producto;
         $producto->tipo = $tipo;
         $producto->nombre = $nombre;
         $producto->codigo_pedido = $codigo_pedido;
 
         $producto->CrearProducto();
 
-        $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
+        $payload = json_encode(array("mensaje" => "Producto creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

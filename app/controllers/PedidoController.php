@@ -26,7 +26,7 @@ class PedidoController extends Pedido implements IApiUsable
         $pedido->sector = $sector;
 
         $pedido->crearPedido();
-        $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
+        $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

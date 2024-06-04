@@ -1,7 +1,7 @@
 <?php
 
-include "Producto.php";
-
+require_once "Producto.php";
+require_once "../app/db/AccesoDatos.php";
 
 class Pedido 
 {

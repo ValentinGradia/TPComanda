@@ -1,6 +1,6 @@
 <?php
-include "Pedido.php";
-
+require_once "Pedido.php";
+require_once "../app/db/AccesoDatos.php";
 
 class Mesa
 {

@@ -1,5 +1,5 @@
 <?php
-require_once './models/Mesa.php';
+require_once "./models/Mesa.php";
 require_once './interfaces/IApiUsable.php';
 
 class MesaController extends Mesa implements IApiUsable
@@ -16,7 +16,7 @@ class MesaController extends Mesa implements IApiUsable
         $mesa->estado_mesa = $estado_mesa;
         $mesa->CrearMesa();
 
-        $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
+        $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

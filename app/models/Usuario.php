@@ -1,6 +1,6 @@
 <?php
 
-include "../db/AccesoDatos.php";
+require_once "../app/db/AccesoDatos.php";
 class Usuario
 {
     public $id_usuario;
@@ -14,12 +14,11 @@ class Usuario
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(id_usuario,nombre,clave,rol) VALUES (:id_usuario,:nombre,:clave,:rol)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(rol,nombre,clave) VALUES (:rol,:nombre,:clave)");
 
-        $sql->bindValue(":id_usuario",$this->id_usuario, PDO::PARAM_INT);
-        $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
-        $sql->bindValue(":clave", $this->clave);
         $sql->bindValue(":rol", $this->rol, PDO::PARAM_STR);
+        $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
+        $sql->bindValue(":clave", $this->clave, PDO::PARAM_INT);
 
         $sql->execute();
     }
@@ -27,7 +26,7 @@ class Usuario
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario, codigo_pedido, rol FROM usuarios");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario,nombre,clave,rol FROM usuarios");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
@@ -37,7 +36,7 @@ class Usuario
     public static function obtenerUsuario($id_usuario)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario, codigo_pedido, rol FROM usuarios WHERE id_usuario = :id_usuario");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_usuario,nombre,clave,rol FROM usuarios WHERE id_usuario = :id_usuario");
         $consulta->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
         $consulta->execute();
 

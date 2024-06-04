@@ -1,5 +1,7 @@
 <?php
 
+require_once "../app/db/AccesoDatos.php";
+
 class Producto
 {
     public $id_producto;
@@ -12,8 +14,7 @@ class Producto
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(id_producto,tipo,nombre,codigo_pedido) VALUES (:id_producto,:nombre,:nombre,:codigo_pedido)");
-        $sql->bindValue(":id_producto",$this->id_producto, PDO::PARAM_INT);
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(tipo,nombre,codigo_pedido) VALUES (:tipo,:nombre,:codigo_pedido)");
         $sql->bindValue(":tipo", $this->tipo, PDO::PARAM_STR);
         $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
         $sql->bindValue(":codigo_pedido", $this->codigo_pedido, PDO::PARAM_INT);

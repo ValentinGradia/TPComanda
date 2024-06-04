@@ -9,6 +9,11 @@ use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 
 require __DIR__ . '/../vendor/autoload.php';
+require_once "../app/controllers/MesaController.php";
+require_once "../app/controllers/UsuarioController.php";
+require_once "../app/controllers/PedidoController.php";
+require_once "../app/controllers/ProductoController.php";
+require_once "../app/db/AccesoDatos.php";
 
 // Instantiate App
 $app = AppFactory::create();
@@ -20,10 +25,17 @@ $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
 // Routes
+
+$app->get("[/]", function(Request $request, Response $response){
+    $response->getBody()->write("funciona!");
+
+    return $response;
+});
+
 $app->group("/usuarios", function (RouteCollectorProxy $group){
-    $group->get("[/]", \UsuarioController::class . ":TraerTodos");
+    $group->get('[/]', \UsuarioController::class . ':TraerTodos');
     $group->get("/{id_usuario}", \UsuarioController::class . ":TraerUno");
-    $group->post("[/]", \UsuarioController::class . ":CargarUno");
+    $group->post('[/]', \UsuarioController::class . ':CargarUno');
 });
 
 $app->group("/productos", function (RouteCollectorProxy $group){
