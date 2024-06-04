@@ -18,6 +18,10 @@ require_once "../app/db/AccesoDatos.php";
 // Instantiate App
 $app = AppFactory::create();
 
+// Load ENV
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
 // Add error middleware
 $app->addErrorMiddleware(true, true, true);
 
