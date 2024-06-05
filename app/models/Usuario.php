@@ -41,25 +41,28 @@ class Usuario
         return $consulta->fetchObject('Usuario');
     }
 
-    // public static function modificarUsuario($usuario)
-    // {
-    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
-    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET codigo_pedido = :codigo_pedido, rol = :rol WHERE id_usuario = :id_usuario");
-    //     $consulta->bindValue(":codigo_pedido", $usuario->codigo_pedido);
-    //     $consulta->bindValue(":rol", $usuario->rol);
-    //     $consulta->bindValue(":id_usuario", $usuario->id_usuario);
+    public static function modificarUsuario($usuario)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET codigo_pedido = :codigo_pedido, rol = :rol,nombre=:nombre,
+        clave=:clave WHERE id_usuario = :id_usuario");
+        $consulta->bindValue(":codigo_pedido", $usuario->codigo_pedido);
+        $consulta->bindValue(":rol", $usuario->rol);
+        $consulta->bindValue(":nombre", $usuario->nombre);
+        $consulta->bindValue(":clave", $usuario->clave);
+        $consulta->bindValue(":id_usuario", $usuario->id_usuario);
 
-    //     $consulta->execute();
-    // }
+        $consulta->execute();
+    }
 
-    // public static function borrarUsuario($usuario)
-    // {
-    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
-    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id = :id");
-    //     $fecha = new DateTime(date("d-m-Y"));
-    //     $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
-    //     $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
-    //     $consulta->execute();
-    // }
+    public static function borrarUsuario($usuario)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id_usuario = :id_usuario");
+        $fecha = new DateTime(date("d-m-Y"));
+        $consulta->bindValue(':id_usuario', $usuario->id_usuario, PDO::PARAM_INT);
+        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+        $consulta->execute();
+    }
     
 }
