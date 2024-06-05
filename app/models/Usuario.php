@@ -7,8 +7,6 @@ class Usuario
     public $nombre;
     public $clave;
     public $rol;
-    //public $ocupado = false;
-    //public $pendientes = [];
 
     public function crearUsuario()
     {
