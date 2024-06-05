@@ -7,16 +7,18 @@ class Producto
     public $nombre;
     public $precio;
     public $cantidad;
+    public $estado_producto;
 
     public function CrearProducto()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(tipo,nombre,precio,cantidad) VALUES (:nombre,:nombre,:precio,:cantidad)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(tipo,nombre,precio,cantidad,estado_producto) VALUES (:nombre,:nombre,:precio,:cantidad,:estado_producto)");
         $sql->bindValue(":tipo", $this->tipo, PDO::PARAM_STR);
         $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
         $sql->bindValue(":precio", $this->precio);
         $sql->bindValue(":cantidad", $this->cantidad);
+        $sql->bindValue(":estado_producto", $this->estado_producto);
 
         $sql->execute();
     }
@@ -24,7 +26,7 @@ class Producto
     public static function ObtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,precio,cantidad FROM productos");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,precio,cantidad,estado_producto FROM productos");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
@@ -34,7 +36,7 @@ class Producto
     public static function ObtenerProducto($id_producto)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,precio,cantidad FROM productos WHERE id_producto = :id_producto");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,precio,cantidad,estado_producto FROM productos WHERE id_producto = :id_producto");
         $consulta->bindValue(':id_producto', $id_producto, PDO::PARAM_STR);
         $consulta->execute();
 
@@ -44,11 +46,13 @@ class Producto
     public static function modificarProducto($producto)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE productos SET tipo = :tipo, nombre=:nombre, precio=:precio, cantidad=:cantidad WHERE id_producto = :id_producto");
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE productos SET tipo = :tipo, nombre=:nombre, precio=:precio, cantidad=:cantidad,
+        estado_producto=:estado_producto WHERE id_producto = :id_producto");
         $consulta->bindValue(":tipo", $producto->tipo);
         $consulta->bindValue(":nombre", $producto->nombre);
         $consulta->bindValue(":precio", $producto->precio);
         $consulta->bindValue(":cantidad", $producto->cantidad);
+        $consulta->bindValue(":estado_producto", $producto->estado_producto);
         $consulta->bindValue(":id_producto", $producto->id_producto);
 
         $consulta->execute();
