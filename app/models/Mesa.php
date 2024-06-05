@@ -41,23 +41,23 @@ class Mesa
         return $consulta->fetchObject('Mesa');
     }
 
-    // public static function modificarMesa($mesa)
-    // {
-    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
-    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET estado_mesa = :estado_mesa WHERE codigo_mesa = :codigo_mesa");
-    //     $consulta->bindValue(":codigo_mesa", $mesa->codigo_mesa);
-    //     $consulta->bindValue(":estado_mesa", $mesa->estado_mesa);
+    public static function modificarMesa($mesa)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET estado_mesa = :estado_mesa WHERE codigo_mesa = :codigo_mesa");
+        $consulta->bindValue(":codigo_mesa", $mesa->codigo_mesa);
+        $consulta->bindValue(":estado_mesa", $mesa->estado_mesa);
 
-    //     $consulta->execute();
-    // }
+        $consulta->execute();
+    }
 
-    // public static function borrarUsuario($usuario)
-    // {
-    //     $objAccesoDato = AccesoDatos::obtenerInstancia();
-    //     $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id = :id");
-    //     $fecha = new DateTime(date("d-m-Y"));
-    //     $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
-    //     $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
-    //     $consulta->execute();
-    // }
+    public static function borrarMesa($mesa)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET fechaBaja = :fechaBaja WHERE codigo_mesa = :id");
+        $fecha = new DateTime(date("d-m-Y"));
+        $consulta->bindValue(':id', $mesa->codigo_mesa, PDO::PARAM_INT);
+        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+        $consulta->execute();
+    }
 }
