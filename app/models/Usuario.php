@@ -7,8 +7,6 @@ class Usuario
     public $nombre;
     public $clave;
     public $rol;
-    //public $ocupado = false;
-    //public $pendientes = [];
 
     public function crearUsuario()
     {
@@ -46,7 +44,8 @@ class Usuario
     public static function modificarUsuario($usuario)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET codigo_pedido = :codigo_pedido, rol = :rol WHERE id_usuario = :id_usuario");
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET codigo_pedido = :codigo_pedido, rol = :rol,nombre=:nombre,
+        clave=:clave WHERE id_usuario = :id_usuario");
         $consulta->bindValue(":codigo_pedido", $usuario->codigo_pedido);
         $consulta->bindValue(":rol", $usuario->rol);
         $consulta->bindValue(":nombre", $usuario->nombre);
