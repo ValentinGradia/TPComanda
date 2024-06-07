@@ -16,7 +16,6 @@ class UsuarioMW
     public function __invoke(Request $request, RequestHandler $handler)
     {
         $this->VerificarRol($request, $handler);
-        self::ValidarRol($request,$handler);
     }
 
     public function VerificarRol(Request $request, RequestHandler $handler)
@@ -38,14 +37,14 @@ class UsuarioMW
     }
 
 
-
     public static function ValidarRol(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
 
-        $params = $request->getQueryParams();
+        $params = $request->getParsedBody();
 
-        if(!isset($params["rol"]))
+
+        if(isset($params["rol"]))
         {
             $rol = $params["rol"];
             if($rol == "socio" || $rol == "bartender" || $rol == "mozo" || $rol == "candybar" ||
@@ -62,5 +61,7 @@ class UsuarioMW
         {
             $response->getBody()->write(json_encode(array("error" => "complete su rol")));
         }
+
+        return $response;
     }
 }
