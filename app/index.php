@@ -18,6 +18,9 @@ require_once "../app/controllers/PedidoController.php";
 require_once "../app/controllers/ProductoController.php";
 require_once "../app/db/AccesoDatos.php";
 require_once "../app/middlewares/UsuarioMW.php";
+require_once "../app/middlewares/MesaMW.php";
+require_once "../app/middlewares/ProductoMW.php";
+require_once "../app/middlewares/PedidoMW.php";
 
 // Instantiate App
 $app = AppFactory::create();
@@ -55,7 +58,8 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get("[/]", \PedidoController::class . ":TraerTodos");
     $group->get("/{codigo_pedido}", \PedidoController::class . ":TraerUno");
-    $group->post("[/]", \PedidoController::class . ":CargarUno");
+    $group->post("[/]", \PedidoController::class . ":CargarUno")->add(new UsuarioMW("mozo"))
+    ->add(PedidoMW::class . ':ValidarCampos');
 });
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
