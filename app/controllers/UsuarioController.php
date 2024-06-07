@@ -8,8 +8,8 @@ class UsuarioController extends Usuario implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $nombre = $parametros['nombre'];
-        $clave = $parametros['clave'];
+        $nombre = $parametros["nombre"];
+        $clave = $parametros["clave"];
         $rol = $parametros['rol'];
 
         $usr = new Usuario();
@@ -46,29 +46,29 @@ class UsuarioController extends Usuario implements IApiUsable
     
     public function ModificarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
 
-        // $nombre = $parametros['nombre'];
-        // Usuario::modificarUsuario($nombre);
+        $usuario = Usuario::obtenerUsuario($parametros["id_usuario"]);
+        Usuario::modificarUsuario($usuario);
 
-        // $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
+        $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
 
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 
     public function BorrarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
 
-        // $usuarioId = $parametros['usuarioId'];
-        // Usuario::borrarUsuario($usuarioId);
+        $usuario = Usuario::obtenerUsuario($parametros["id_usuario"]);
+        Usuario::borrarUsuario($usuario);
 
-        // $payload = json_encode(array("mensaje" => "Usuario borrado con exito"));
+        $payload = json_encode(array("mensaje" => "Usuario borrado con exito"));
 
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 }

@@ -10,12 +10,16 @@ class ProductoController extends Producto implements IApiUsable
 
         $tipo = $parametros['tipo'];
         $nombre = $parametros["nombre"];
-        $codigo_pedido = $parametros["codigo_pedido"];
+        $precio = $parametros["precio"];
+        $cantidad = $parametros["cantidad"];
+        $estado_producto = $parametros["estado_producto"];
 
         $producto = new Producto();
         $producto->tipo = $tipo;
         $producto->nombre = $nombre;
-        $producto->codigo_pedido = $codigo_pedido;
+        $producto->precio = $precio;
+        $producto->cantidad = $cantidad;
+        $producto->estado_producto = $estado_producto;
 
         $producto->CrearProducto();
 
@@ -47,29 +51,29 @@ class ProductoController extends Producto implements IApiUsable
     
     public function ModificarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
 
-        // $nombre = $parametros['nombre'];
-        // Usuario::modificarUsuario($nombre);
+        $producto = Producto::ObtenerProducto($parametros["id_producto"]);
+        Producto::modificarProducto($producto);
 
-        // $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
+        $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
 
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 
     public function BorrarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
 
-        // $usuarioId = $parametros['usuarioId'];
-        // Usuario::borrarUsuario($usuarioId);
+        $producto = Producto::ObtenerProducto($parametros["id_producto"]);
+        Producto::borrarProducto($producto);
 
-        // $payload = json_encode(array("mensaje" => "Usuario borrado con exito"));
+        $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
 
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 }
