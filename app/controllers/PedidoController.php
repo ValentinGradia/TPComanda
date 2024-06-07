@@ -11,22 +11,18 @@ class PedidoController extends Pedido implements IApiUsable
         $codigo_mesa = $parametros['codigo_mesa'];
         $codigo_pedido = $parametros['codigo_pedido'];
         $estado_pedido = $parametros["estado_pedido"];
-        $fecha_inicio_pedido = $parametros["fecha_inicio_pedido"];
-        $fecha_cierre_pedido = $parametros["fecha_cierre_pedido"];
         $nombre_cliente = $parametros["nombre_cliente"];
-        $sector = $parametros["sector"]; 
+        $tiempo_preparacion = $parametros["tiempo_preparacion"];
 
         $pedido = new Pedido();
         $pedido->codigo_mesa = $codigo_mesa;
         $pedido->codigo_pedido = $codigo_pedido;
         $pedido->estado_pedido = $estado_pedido;
-        $pedido->fecha_inicio_pedido = $fecha_inicio_pedido;
-        $pedido->fecha_cierre_pedido = $fecha_cierre_pedido;
         $pedido->nombre_cliente = $nombre_cliente;
-        $pedido->sector = $sector;
+        $pedido->tiempo_preparacion = $tiempo_preparacion;
 
         $pedido->crearPedido();
-        $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
+        $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
@@ -54,29 +50,28 @@ class PedidoController extends Pedido implements IApiUsable
     
     public function ModificarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
+        $pedido = Pedido::obtenerPedido($parametros["codigo_pedido"]);
+        Pedido::modificarPedido($pedido);
 
-        // $nombre = $parametros['nombre'];
-        // Usuario::modificarUsuario($nombre);
+        $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));
 
-        // $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
-
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 
     public function BorrarUno($request, $response, $args)
     {
-        // $parametros = $request->getParsedBody();
+        $parametros = $request->getParsedBody();
+        $pedido = Pedido::obtenerPedido($parametros["codigo_pedido"]);
 
-        // $usuarioId = $parametros['usuarioId'];
-        // Usuario::borrarUsuario($usuarioId);
+        Pedido::borrarPedido($pedido);
+        
+        $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
 
-        // $payload = json_encode(array("mensaje" => "Usuario borrado con exito"));
-
-        // $response->getBody()->write($payload);
-        // return $response
-        //   ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
 }
