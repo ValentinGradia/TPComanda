@@ -65,8 +65,9 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->get('[/]', \MesaController::class . ':TraerTodos');
-    $group->get('/buscar', \MesaController::class . ':TraerUno');//->add(MesaMW::class . 'ValidarCodigoNoExistente');
-    $group->post('[/]', \MesaController::class . ":CargarUno");
+    $group->get('/buscar', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
+    $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
+    ->add(MesaMW::class . ':ValidarCampos');
 });
 
 $app->run();

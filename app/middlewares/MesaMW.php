@@ -25,10 +25,27 @@ class MesaMW implements IApiCampos
         return $response;
     }
 
-    public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
+    public static function ValidarCodigoExistente(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
         $params = $request->getParsedBody();
+
+        if(Mesa::ObtenerMesa($params["codigo_mesa"]))
+        {
+            $response->getBody()->write(json_encode(array("error" => "esa mesa ya existe")));
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+    }
+
+    public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getQueryParams();
 
         if(Mesa::ObtenerMesa($params["codigo_mesa"]))
         {
@@ -38,5 +55,7 @@ class MesaMW implements IApiCampos
         {
             $response->getBody()->write(json_encode(array("error" => "codigo de mesa no existente")));
         }
+
+        return $response;
     }
 }
