@@ -48,7 +48,7 @@ class UsuarioMW
         {
             $rol = $params["rol"];
             if($rol == "socio" || $rol == "bartender" || $rol == "mozo" || $rol == "candybar" ||
-            $rol == "cocinero")
+            $rol == "cocinero" || $rol == "cliente")
             {
                 $response = $handler->handle($request);
             }

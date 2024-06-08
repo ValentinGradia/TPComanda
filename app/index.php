@@ -57,7 +57,7 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 });
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){
-    $group->get('[/]', \PedidoController::class . ":TraerTodos");
+    $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
     $group->get('/{codigo_pedido}', \PedidoController::class . ":TraerUno");
     $group->post("[/]", \PedidoController::class . ":CargarUno")->add(new UsuarioMW("mozo"))
     ->add(PedidoMW::class . ':ValidarCampos');
@@ -69,5 +69,7 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCampos');
 });
+
+$app->get('tiempo_restante', UsuarioMW::class .)
 
 $app->run();
