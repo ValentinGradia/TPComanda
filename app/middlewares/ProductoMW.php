@@ -4,10 +4,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
-require_once "../interfaces/IApiCampos.php";
+//include "../interfaces/IApiCampos.php";
 
 
-class ProductoMW implements IApiCampos
+class ProductoMW 
 {
     public static function ValidarCampos(Request $request, RequestHandler $handler)
     {
@@ -26,5 +26,24 @@ class ProductoMW implements IApiCampos
         }
 
         return $response;
+    }
+
+    public static function ValidarTipo(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getParsedBody();
+
+        if($params["tipo"] === "cerveza" || $params["tipo"] === "trago" || $params["tipo"] === "comida")
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "tipo de producto invalido"))); 
+        }
+
+        return $response;
+
     }
 }

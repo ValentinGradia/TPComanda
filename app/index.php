@@ -52,7 +52,8 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
     $group->get("/{id_producto}", \ProductoController::class . ":TraerUno");
-    $group->post("[/]", \ProductoController::class . ":CargarUno");
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarTipo')
+    ->add(ProductoMW::class . ':ValidarCampos');
 });
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){

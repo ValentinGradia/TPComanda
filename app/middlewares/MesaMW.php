@@ -4,10 +4,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
-require_once "../interfaces/IApiCampos.php";
-require_once "../models/Mesa.php";
 
-class MesaMW implements IApiCampos
+class MesaMW 
 {
     public static function ValidarCampos(Request $request, RequestHandler $handler)
     {
