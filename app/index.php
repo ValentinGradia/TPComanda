@@ -57,16 +57,16 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 });
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){
-    $group->get("[/]", \PedidoController::class . ":TraerTodos");
-    $group->get("/{codigo_pedido}", \PedidoController::class . ":TraerUno");
+    $group->get('[/]', \PedidoController::class . ":TraerTodos");
+    $group->get('/{codigo_pedido}', \PedidoController::class . ":TraerUno");
     $group->post("[/]", \PedidoController::class . ":CargarUno")->add(new UsuarioMW("mozo"))
     ->add(PedidoMW::class . ':ValidarCampos');
 });
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
-    $group->get("[/]", \MesaController::class . ":TraerTodos");
-    $group->get("/{codigo_mesa}", \MesaController::class . ":TraerUno");
-    $group->post("[/]", \MesaController::class . ":CargarUno");
+    $group->get('[/]', \MesaController::class . ':TraerTodos');
+    $group->get('/buscar', \MesaController::class . ':TraerUno');//->add(MesaMW::class . 'ValidarCodigoNoExistente');
+    $group->post('[/]', \MesaController::class . ":CargarUno");
 });
 
 $app->run();

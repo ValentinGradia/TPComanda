@@ -4,10 +4,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
-//include "../interfaces/IApiCampos.php";
+require_once './interfaces/IApiCampos.php';
 
 
-class ProductoMW 
+class ProductoMW implements IApiCampos
 {
     public static function ValidarCampos(Request $request, RequestHandler $handler)
     {

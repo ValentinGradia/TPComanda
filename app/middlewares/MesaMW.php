@@ -4,8 +4,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
+require_once './models/Mesa.php';
+require_once './interfaces/IApiCampos.php';
 
-class MesaMW 
+class MesaMW implements IApiCampos
 {
     public static function ValidarCampos(Request $request, RequestHandler $handler)
     {
@@ -21,5 +23,20 @@ class MesaMW
         }
 
         return $response;
+    }
+
+    public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getParsedBody();
+
+        if(Mesa::ObtenerMesa($params["codigo_mesa"]))
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "codigo de mesa no existente")));
+        }
     }
 }
