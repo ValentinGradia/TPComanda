@@ -29,7 +29,8 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerUno($request, $response, $args)
     {
-        $codigo_pedido = $args['codigo_pedido'];
+        $params = $request->getQueryParams();
+        $codigo_pedido = $params['codigo_pedido'];
         $pedido = Pedido::obtenerPedido($codigo_pedido);
         $payload = json_encode($pedido);
 

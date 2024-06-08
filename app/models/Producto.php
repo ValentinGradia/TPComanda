@@ -13,7 +13,7 @@ class Producto
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(tipo,nombre,precio,cantidad,estado_producto) VALUES (:nombre,:nombre,:precio,:cantidad,:estado_producto)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO productos(tipo,nombre,precio,cantidad,estado_producto) VALUES (:nombre,:tipo,:precio,:cantidad,:estado_producto)");
         $sql->bindValue(":tipo", $this->tipo, PDO::PARAM_STR);
         $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
         $sql->bindValue(":precio", $this->precio);
