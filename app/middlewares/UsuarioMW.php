@@ -4,6 +4,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
+
+require_once './models/Producto.php';
+
 class UsuarioMW
 {
     private $perfil ='';
@@ -15,14 +18,15 @@ class UsuarioMW
 
     public function __invoke(Request $request, RequestHandler $handler)
     {
-        $this->VerificarRol($request, $handler);
+        return $this->VerificarRol($request, $handler);
     }
 
     public function VerificarRol(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
-
-        $params = $request->getQueryParams();
+        $queryParams = $request->getQueryParams();
+        $bodyParams = $request->getParsedBody();
+        $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
         if($params["rol"] !== $this->perfil)
         {
@@ -31,6 +35,66 @@ class UsuarioMW
         else
         {
             $response = $handler->handle($request);
+        }
+
+        return $response;
+    }
+
+    public static function ValidarCambioEstadoProducto(Request $request, RequestHandler $handler)
+    {
+        parse_str(file_get_contents("php://input"), $params);
+
+        $response = new ResponseClass();
+        $rol = $params["rol"];
+
+        $producto = Producto::ObtenerProducto($params["id_producto"]);
+        $tipo_producto = $producto->tipo;
+        $flag = false;
+
+        switch($tipo_producto)
+        {
+            case "comida":
+                if(!($rol == "cocinero"))
+                {
+                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                }
+                else
+                {
+                    $producto->estado_producto = "listo";
+                    $flag = true;
+                    $response = $handler->handle($request);
+                }
+                break;
+            case "trago":
+                    if(!$rol == "bartender")
+                    {
+                        $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                    }
+                    else
+                    {
+                        $flag = true;
+                        $producto->estado_producto = "listo";
+                        $response = $handler->handle($request);
+                    }
+                    break;
+            default:
+                if(!$rol == "cervecero")
+                {
+                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                }
+                else
+                {
+                    $flag = true;
+                    $producto->estado_producto = "listo";
+                    $response = $handler->handle($request);
+                }
+                break;
+            
+        }
+
+        if($flag)
+        {
+            Producto::modificarProducto($producto);
         }
 
         return $response;

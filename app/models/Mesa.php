@@ -51,6 +51,7 @@ class Mesa
         $consulta->execute();
     }
 
+
     public static function borrarMesa($mesa)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();

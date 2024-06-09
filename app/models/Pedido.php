@@ -9,16 +9,17 @@ class Pedido
     public $codigo_pedido;
     public $estado_pedido;
     public $tiempo_preparacion;
+    public $tiempo_entrega;
     public $nombre_cliente;
 
     public function crearPedido()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO pedidos(codigo_mesa,codigo_pedido,estado_pedido,nombre_cliente) VALUES (:codigo_mesa,:codigo_pedido,:estado_pedido,:tiempo_preparacion,:nombre_cliente,:sector)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO pedidos(codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,nombre_cliente) VALUES (:codigo_mesa,:codigo_pedido,:estado_pedido,:tiempo_preparacion,:nombre_cliente)");
 
         $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
-        $sql->bindValue(":codigo_pedido", $this->codigo_pedido, PDO::PARAM_INT);
+        $sql->bindValue(":codigo_pedido", $this->codigo_pedido);
         $sql->bindValue(":estado_pedido", $this->estado_pedido, PDO::PARAM_STR);
         $sql->bindValue(":tiempo_preparacion",$this->tiempo_preparacion);
         $sql->bindValue(":nombre_cliente", $this->nombre_cliente, PDO::PARAM_STR);

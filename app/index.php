@@ -52,15 +52,16 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
     $group->get("/{id_producto}", \ProductoController::class . ":TraerUno");
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarTipo')
-    ->add(ProductoMW::class . ':ValidarCampos');
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(MesaMW::class . ':CambiarEstadoMesa')->add(new UsuarioMW("cliente"))
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
+    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto');
 });
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
     $group->get('/{codigo_pedido}', \PedidoController::class . ":TraerUno");
-    $group->post("[/]", \PedidoController::class . ":CargarUno")->add(new UsuarioMW("mozo"))
-    ->add(PedidoMW::class . ':ValidarCampos');
+    $group->post("[/]", \PedidoController::class . ":CargarUno")->add(MesaMW::class . ':ValidarEstadoMesa')->add(MesaMW::class . ':ValidarCodigoNoExistente')
+    ->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
 });
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
@@ -70,6 +71,6 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarCampos');
 });
 
-$app->get('tiempo_restante', UsuarioMW::class .)
+// $app->get('tiempo_restante', UsuarioMW::class .)
 
 $app->run();

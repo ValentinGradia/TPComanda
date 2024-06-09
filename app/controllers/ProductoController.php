@@ -13,6 +13,7 @@ class ProductoController extends Producto implements IApiUsable
         $precio = $parametros["precio"];
         $cantidad = $parametros["cantidad"];
         $estado_producto = $parametros["estado_producto"];
+        $codigo_mesa = $parametros["codigo_mesa"];
 
         $producto = new Producto();
         $producto->tipo = $tipo;
@@ -20,6 +21,7 @@ class ProductoController extends Producto implements IApiUsable
         $producto->precio = $precio;
         $producto->cantidad = $cantidad;
         $producto->estado_producto = $estado_producto;
+        $producto->codigo_mesa = $codigo_mesa;
 
         $producto->CrearProducto();
 

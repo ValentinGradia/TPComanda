@@ -39,6 +39,18 @@ class PedidoController extends Pedido implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
+    public function TraerTiempoRestante($request, $response, $args)
+    {
+        $params = $request->getQueryParams();
+        $codigo_pedido = $params['codigo_pedido'];
+        $pedido = Pedido::obtenerPedido($codigo_pedido);
+        $payload = json_encode($pedido);
+
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
+    }
+
     public function TraerTodos($request, $response, $args)
     {
         $lista = Pedido::obtenerTodos();
