@@ -65,6 +65,12 @@ class PedidoController extends Pedido implements IApiUsable
     {
         $parametros = $request->getParsedBody();
         $pedido = Pedido::obtenerPedido($parametros["codigo_pedido"]);
+
+        $pedido->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $pedido->codigo_mesa;
+        $pedido->estado_pedido = !empty($parametros["estado_pedido"]) ? $parametros["estado_pedido"] : $pedido->estado_pedido;
+        $pedido->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $pedido->tiempo_preparacion;
+        $pedido->tiempo_entrega = !empty($parametros["tiempo_entrega"]) ? $parametros["tiempo_entrega"] : $pedido->tiempo_entrega;
+        $pedido->nombre_cliente = !empty($parametros["nombre_cliente"]) ? $parametros["nombre_cliente"] : $pedido->nombre_cliente;
         Pedido::modificarPedido($pedido);
 
         $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));

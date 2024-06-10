@@ -92,10 +92,10 @@ class UsuarioMW
             
         }
 
-        if($flag)
-        {
-            Producto::modificarProducto($producto);
-        }
+        // if($flag)
+        // {
+        //     Producto::modificarProducto($producto);
+        // }
 
         return $response;
     }
@@ -112,7 +112,7 @@ class UsuarioMW
         {
             $rol = $params["rol"];
             if($rol == "socio" || $rol == "bartender" || $rol == "mozo" ||
-            $rol == "cocinero" || $rol == "cliente")
+            $rol == "cocinero" || $rol == "cliente" || $rol == "cervecero")
             {
                 $response = $handler->handle($request);
             }

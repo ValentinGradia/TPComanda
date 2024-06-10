@@ -57,6 +57,14 @@ class ProductoController extends Producto implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $producto = Producto::ObtenerProducto($parametros["id_producto"]);
+
+        $producto->tipo = !empty($parametros["tipo"]) ? $parametros["tipo"] : $producto->tipo;
+        $producto->nombre = !empty($parametros["nombre"]) ? $parametros["nombre"] : $producto->nombre;
+        $producto->precio = !empty($parametros["precio"]) ? $parametros["precio"] : $producto->precio;
+        $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
+        $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
+        $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
+
         Producto::modificarProducto($producto);
 
         $payload = json_encode(array("mensaje" => "Producto modificado con exito"));

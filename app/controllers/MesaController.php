@@ -48,6 +48,8 @@ class MesaController extends Mesa implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $mesa = Mesa::ObtenerMesa($parametros["codigo_mesa"]);
+
+        $mesa->estado_mesa = !empty($parametros["estado_mesa"]) ? $parametros["estado_mesa"] : $mesa->estado_mesa;
         Mesa::modificarMesa($mesa);
 
         $payload = json_encode(array("mensaje" => "Mesa modificada con exito"));
