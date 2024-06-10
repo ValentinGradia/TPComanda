@@ -5,6 +5,8 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
 require_once './interfaces/IApiCampos.php';
+require_once './models/Producto.php';
+require_once './models/Pedido.php';
 
 
 
@@ -29,5 +31,44 @@ class PedidoMW implements IApiCampos
         }
 
         return $response;
+    }
+
+    public static function ValidarProductosListos(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        parse_str(file_get_contents("php://input"), $params);
+
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $pedido = Pedido::obtenerPedido($codigo_pedido);
+        $codigo_mesa = $pedido->codigo_mesa;
+
+        $productos = Producto::ObtenerTodos();
+
+        $flag = true;
+        foreach($productos as $producto)
+        {
+            if($producto->codigo_mesa == $codigo_mesa)
+            {
+                if($producto->estado_producto !== "listo")
+                {
+                    $flag = false;
+                    break;
+                }
+            }
+        }
+
+        if($flag)
+        {
+            $pedido->estado_pedido = "listo para servir";
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "los productos aun no estan listos para servir")));
+        }
+
+        return $response;
+
     }
 }

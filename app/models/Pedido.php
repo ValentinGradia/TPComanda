@@ -31,7 +31,7 @@ class Pedido
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,
-        nombre_cliente, FROM pedidos");
+        nombre_cliente FROM pedidos");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
@@ -42,7 +42,7 @@ class Pedido
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,
-        nombre_cliente, FROM pedidos WHERE codigo_pedido = :codigo_pedido");
+        nombre_cliente FROM pedidos WHERE codigo_pedido = :codigo_pedido");
         $consulta->bindValue(':codigo_pedido', $codigo_pedido, PDO::PARAM_INT);
         $consulta->execute();
 
@@ -53,7 +53,7 @@ class Pedido
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $sql = $objAccesoDato->prepararConsulta("UPDATE pedidos SET codigo_mesa=:codigo_mesa, estado_pedido=:estado_pedido,
-        tiempo_preparacion=:tiempo_preparacion,nombre_cliente=:nombre_cliente,WHERE codigo_pedido = :codigo_pedido");
+        tiempo_preparacion=:tiempo_preparacion,nombre_cliente=:nombre_cliente WHERE codigo_pedido = :codigo_pedido");
 
         $sql->bindValue(":codigo_mesa",$pedido->codigo_mesa, PDO::PARAM_INT);
         $sql->bindValue(":codigo_pedido", $pedido->codigo_pedido, PDO::PARAM_INT);

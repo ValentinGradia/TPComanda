@@ -111,7 +111,7 @@ class UsuarioMW
         if(isset($params["rol"]))
         {
             $rol = $params["rol"];
-            if($rol == "socio" || $rol == "bartender" || $rol == "mozo" || $rol == "candybar" ||
+            if($rol == "socio" || $rol == "bartender" || $rol == "mozo" ||
             $rol == "cocinero" || $rol == "cliente")
             {
                 $response = $handler->handle($request);
