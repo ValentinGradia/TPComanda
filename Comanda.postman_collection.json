@@ -1,0 +1,172 @@
+{
+	"info": {
+		"_postman_id": "b551d4eb-ed29-47b2-9e7f-6e9e9921b3f0",
+		"name": "Comanda",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35095325"
+	},
+	"item": [
+		{
+			"name": "1er sprint",
+			"item": [
+				{
+					"name": "cargar usuarios",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "eugenia",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "754",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cocinero",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/usuarios",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cargar mesas",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "cargar productos",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "cargar pedidos",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2do sprint",
+			"item": [
+				{
+					"name": "chequear mesas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/mesas/buscar?codigo_mesa=11111",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"buscar"
+							],
+							"query": [
+								{
+									"key": "codigo_mesa",
+									"value": "11111"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cambiar estado producto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "camb",
+							"host": [
+								"camb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cambiar estado pedido",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "codigo_pedido",
+									"value": "abcde",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "mozo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/pedidos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "modificar estado mesas",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/mesas",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

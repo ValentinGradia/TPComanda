@@ -45,6 +45,16 @@ class Producto
         return $consulta->fetchObject('Producto');
     }
 
+    public static function ObtenerProductosCodigoMesa($codigo_mesa)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id_producto,tipo,nombre,precio,cantidad,estado_producto,codigo_mesa FROM productos WHERE codigo_mesa = :codigo_mesa");
+        $consulta->bindValue(':codigo_mesa', $codigo_mesa, PDO::PARAM_INT);
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
+    }
+
     public static function modificarProducto($producto)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();

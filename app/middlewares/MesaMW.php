@@ -52,7 +52,7 @@ class MesaMW implements IApiCampos
             else if($mesa->estado_mesa == "con cliente esperando pedido" && $estado_mesa == "con cliente comiendo" )
             {
                 $pedido->tiempo_entrega = $params["tiempo_entrega"];
-                Pedido::modificarPedido($pedido);
+                //Pedido::modificarPedido($pedido);
                 $response = $handler->handle($request);
             }
             else

@@ -33,6 +33,23 @@ class PedidoMW implements IApiCampos
         return $response;
     }
 
+    public static function ValidarCodigoExistente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getParsedBody();
+
+        if(Pedido::obtenerPedido($params["codigo_pedido"]))
+        {
+            $response->getBody()->write(json_encode(array("error" => "esa codigo ya existe")));
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+    }
+
     
     public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
     {
@@ -66,6 +83,7 @@ class PedidoMW implements IApiCampos
         $productos = Producto::ObtenerTodos();
 
         $flag = true;
+        //validar que los productos esten listos para poder servir el pedido
         foreach($productos as $producto)
         {
             if($producto->codigo_mesa == $codigo_mesa)

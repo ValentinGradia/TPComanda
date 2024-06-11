@@ -49,48 +49,54 @@ class UsuarioMW
 
         $producto = Producto::ObtenerProducto($params["id_producto"]);
         $tipo_producto = $producto->tipo;
-        $flag = false;
 
-        switch($tipo_producto)
+        //validar que el producto ingresado este pendiente
+        if($producto->estado_producto == "pendiente")
         {
-            case "comida":
-                if(!($rol == "cocinero"))
-                {
-                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
-                }
-                else
-                {
-                    $producto->estado_producto = "listo";
-                    $flag = true;
-                    $response = $handler->handle($request);
-                }
-                break;
-            case "trago":
-                    if(!$rol == "bartender")
+            //Dependiendo el tipo de producto ira a determinado empleado
+            switch($tipo_producto)
+            {
+                case "comida":
+                    if(!($rol == "cocinero"))
                     {
                         $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
                     }
                     else
                     {
-                        $flag = true;
                         $producto->estado_producto = "listo";
                         $response = $handler->handle($request);
                     }
                     break;
-            default:
-                if(!$rol == "cervecero")
-                {
-                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
-                }
-                else
-                {
-                    $flag = true;
-                    $producto->estado_producto = "listo";
-                    $response = $handler->handle($request);
-                }
-                break;
-            
+                case "trago":
+                        if(!$rol == "bartender")
+                        {
+                            $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                        }
+                        else
+                        {
+                            $producto->estado_producto = "listo";
+                            $response = $handler->handle($request);
+                        }
+                        break;
+                default:
+                    if(!$rol == "cervecero")
+                    {
+                        $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                    }
+                    else
+                    {
+                        $producto->estado_producto = "listo";
+                        $response = $handler->handle($request);
+                    }
+                    break;
+                
+            }
         }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "algo salio mal...")));
+        }
+
 
 
         return $response;

@@ -4,7 +4,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
+use function PHPSTORM_META\map;
+
 require_once './interfaces/IApiCampos.php';
+require_once './models/Producto.php';
 
 
 class ProductoMW implements IApiCampos
@@ -45,6 +48,33 @@ class ProductoMW implements IApiCampos
         }
 
         return $response;
+    }
+
+    public static function ValidarEstadoProducto(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getParsedBody();
+        $codigo_mesa = $params["codigo_mesa"];
+        
+        $productos = Producto::ObtenerProductosCodigoMesa($codigo_mesa);
+
+        $productosPendientes = array_filter($productos, function($producto){
+            return $producto->estado_producto == "pendiente";
+        });
+
+        //validar que los productos hayan sido pedidos para poder crear dicho pedido
+        if(count($productosPendientes) !== 0)
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "aun el cliente no pidio ningun producto"))); 
+        }
+
+        return $response;
+
+
     }
 
     public static function ValidarTipo(Request $request, RequestHandler $handler)
