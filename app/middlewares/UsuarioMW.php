@@ -92,10 +92,6 @@ class UsuarioMW
             
         }
 
-        // if($flag)
-        // {
-        //     Producto::modificarProducto($producto);
-        // }
 
         return $response;
     }

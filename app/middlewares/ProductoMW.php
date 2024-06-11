@@ -28,6 +28,25 @@ class ProductoMW implements IApiCampos
         return $response;
     }
 
+    public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $queryParams = $request->getQueryParams();
+        $bodyParams = $request->getParsedBody();
+        $params = !empty($queryParams) ? $queryParams : $bodyParams;
+
+        if(Mesa::ObtenerMesa($params["id_producto"]))
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "id producto no existente")));
+        }
+
+        return $response;
+    }
+
     public static function ValidarTipo(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();

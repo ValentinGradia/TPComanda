@@ -32,6 +32,25 @@ class PedidoMW implements IApiCampos
 
         return $response;
     }
+    
+    public static function ValidarCodigoNoExistente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $queryParams = $request->getQueryParams();
+        $bodyParams = $request->getParsedBody();
+        $params = !empty($queryParams) ? $queryParams : $bodyParams;
+
+        if(Pedido::obtenerPedido($params["codigo_pedido"]))
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "codigo de pedido no existente")));
+        }
+
+        return $response;
+    }
 
     public static function ValidarProductosListos(Request $request, RequestHandler $handler)
     {

@@ -5,6 +5,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
 require_once './models/Mesa.php';
+require_once './models/Pedido.php';
 require_once './interfaces/IApiCampos.php';
 
 class MesaMW implements IApiCampos
@@ -28,17 +29,37 @@ class MesaMW implements IApiCampos
 
     public static function CambiarEstadoMesa(Request $request, RequestHandler $handler)
     {
+        $response = new ResponseClass();
         $params = $request->getParsedBody();
+
         $codigo_mesa = $params["codigo_mesa"];
+        $codigo_pedido = $params["codigo_pedido"];
+        $estado_mesa = $params["estado_mesa"];
 
         $mesa = Mesa::ObtenerMesa($codigo_mesa);
-        if($mesa->estado_mesa == "cerrada")
+        $pedido = Pedido::obtenerPedido($codigo_pedido);
+
+        if($pedido->codigo_mesa != $codigo_mesa)
         {
-            $mesa->estado_mesa = "con cliente esperando pedido";
-            Mesa::modificarMesa($mesa);
+            $response->getBody()->write(json_encode(array("error" => "ese pedido no pertenece a esa mesa"))); 
+        }
+        else
+        {
+            if($mesa->estado_mesa == "cerrada" && $estado_mesa == "con cliente esperando pedido")
+            {
+                $response = $handler->handle($request);
+            }
+            else if($mesa->estado_mesa == "con cliente esperando pedido" && $estado_mesa == "con cliente comiendo" )
+            {
+                $response = $handler->handle($request);
+            }
+            else
+            {
+                $response->getBody()->write(json_encode(array("error" => "verifique el estado mesa ingresado"))); 
+            }
         }
 
-        $response = $handler->handle($request);
+
         return $response;
 
     }
@@ -52,7 +73,7 @@ class MesaMW implements IApiCampos
 
         $mesa = Mesa::ObtenerMesa($codigo_mesa);
 
-        if($mesa->estado_mesa == "con cliente esperando pedido")
+        if($mesa->estado_mesa == "con cliente esperando pedido" || $mesa->estado_mesa == "con cliente comiendo")
         {
             $response = $handler->handle($request);
         }
