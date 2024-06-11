@@ -53,12 +53,13 @@ class Pedido
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $sql = $objAccesoDato->prepararConsulta("UPDATE pedidos SET codigo_mesa=:codigo_mesa, estado_pedido=:estado_pedido,
-        tiempo_preparacion=:tiempo_preparacion,nombre_cliente=:nombre_cliente WHERE codigo_pedido = :codigo_pedido");
+        tiempo_preparacion=:tiempo_preparacion, tiempo_entrega=:tiempo_entrega, nombre_cliente=:nombre_cliente WHERE codigo_pedido = :codigo_pedido");
 
         $sql->bindValue(":codigo_mesa",$pedido->codigo_mesa, PDO::PARAM_INT);
         $sql->bindValue(":codigo_pedido", $pedido->codigo_pedido, PDO::PARAM_INT);
         $sql->bindValue(":estado_pedido", $pedido->estado_pedido, PDO::PARAM_STR);
         $sql->bindValue(":tiempo_preparacion",$pedido->tiempo_preparacion);
+        $sql->bindValue(":tiempo_entrega", $pedido->tiempo_entrega);
         $sql->bindValue(":nombre_cliente", $pedido->nombre_cliente, PDO::PARAM_STR);
 
         $sql->execute();
