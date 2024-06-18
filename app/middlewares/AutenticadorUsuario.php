@@ -28,4 +28,37 @@ class AutenticadorUsuario
         }
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public static function verificarClave(Request $request, RequestHandler $handler)
+    {
+        $header = $request->getHeaderLine('Authorization');
+        $params = $request->getParsedBody();
+        $response = new Response();
+
+        $token = trim(explode("Bearer", $header)[1]);
+
+        try
+        {
+            $datos = AutentificadorJWT::ObtenerData($token);
+
+            if(isset($params["clave"]))
+            {
+                if($datos->clave == $params["clave"])
+                {
+                    $response = $handler->handle($request);
+                }
+                else
+                {
+                    $response->getBody()->write(json_encode(array("error" => "contraseña incorrecta"))); 
+                }
+            }
+            else{
+                throw new Exception("Ingrese su contraseña"); 
+            }
+        }catch(Exception $e){
+            $response->getBody()->write($e->getMessage());
+        }
+
+        return $response;
+    }
 }

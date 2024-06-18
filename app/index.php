@@ -96,7 +96,9 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarEstadoMesa')->add(PedidoMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
 
-    $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')->add(new UsuarioMW("mozo"))->add(UsuarioMW::class . ':ValidarRol')
+    $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
+    ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
+    ->add(new UsuarioMW("mozo"))->add(UsuarioMW::class . ':ValidarRol')
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 });
 
@@ -108,7 +110,8 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCampos');
 
-    $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')->add(new UsuarioMW("mozo"))
+    $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
+    ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 });
 
