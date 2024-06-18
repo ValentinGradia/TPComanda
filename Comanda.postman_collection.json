@@ -51,7 +51,32 @@
 					"name": "cargar mesas",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "codigo_mesa",
+									"value": "22222",
+									"type": "text"
+								},
+								{
+									"key": "estado_mesa",
+									"value": "cerrada",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/mesas",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas"
+							]
+						}
 					},
 					"response": []
 				},
@@ -59,7 +84,57 @@
 					"name": "cargar productos",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "comida",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "2100",
+									"type": "text"
+								},
+								{
+									"key": "cantidad",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "estado_producto",
+									"value": "pendiente",
+									"type": "text"
+								},
+								{
+									"key": "codigo_mesa",
+									"value": "11111",
+									"type": "text"
+								},
+								{
+									"key": "nombre",
+									"value": "fideos",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cliente",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos"
+							]
+						}
 					},
 					"response": []
 				},
@@ -67,7 +142,52 @@
 					"name": "cargar pedidos",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "codigo_mesa",
+									"value": "11111",
+									"type": "text"
+								},
+								{
+									"key": "codigo_pedido",
+									"value": "ooooo",
+									"type": "text"
+								},
+								{
+									"key": "estado_pedido",
+									"value": "en preparacion",
+									"type": "text"
+								},
+								{
+									"key": "tiempo_preparacion",
+									"value": "2024-08-06 16:40",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "mozo",
+									"type": "text"
+								},
+								{
+									"key": "nombre_cliente",
+									"value": "valentin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/pedidos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos"
+							]
+						}
 					},
 					"response": []
 				}
@@ -82,7 +202,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:666/mesas/buscar?codigo_mesa=11111",
+							"raw": "localhost:666/mesas/buscar?codigo_mesa=22222",
 							"host": [
 								"localhost"
 							],
@@ -94,7 +214,7 @@
 							"query": [
 								{
 									"key": "codigo_mesa",
-									"value": "11111"
+									"value": "22222"
 								}
 							]
 						}
@@ -105,11 +225,46 @@
 					"name": "cambiar estado producto",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id_producto",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cervecero",
+									"type": "text"
+								},
+								{
+									"key": "estado_producto",
+									"value": "listo",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "900",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
-							"raw": "camb",
+							"raw": "localhost:666/productos",
 							"host": [
-								"camb"
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos"
 							]
 						}
 					},
@@ -132,6 +287,21 @@
 									"key": "rol",
 									"value": "mozo",
 									"type": "text"
+								},
+								{
+									"key": "estado_pedido",
+									"value": "listo",
+									"type": "text"
+								},
+								{
+									"key": "nombre_cliente",
+									"value": "eugenio",
+									"type": "text"
+								},
+								{
+									"key": "id_producto",
+									"value": "",
+									"type": "text"
 								}
 							]
 						},
@@ -153,6 +323,36 @@
 					"request": {
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "codigo_mesa",
+									"value": "11111",
+									"type": "text"
+								},
+								{
+									"key": "codigo_pedido",
+									"value": "abcde",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "mozo",
+									"type": "text"
+								},
+								{
+									"key": "estado_mesa",
+									"value": "con cliente comiendo",
+									"type": "text"
+								},
+								{
+									"key": "tiempo_entrega",
+									"value": "2024-09-07 14:24",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
 							"raw": "localhost:666/mesas",
 							"host": [
@@ -161,6 +361,112 @@
 							"port": "666",
 							"path": [
 								"mesas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3er sprint",
+			"item": [
+				{
+					"name": "verificar tokens",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MTg0ODM3ODcsImV4cCI6MTcxODU0Mzc4NywiYXVkIjoiZTYyNDQwYTliZDEwODE3ZmZiZTE1OTg3MTc4OTY4NzAwMDU3NjQxMCIsImRhdGEiOnsibm9tYnJlIjoidmFsZW50aW4iLCJjbGF2ZSI6ImhvbGEiLCJyb2wiOiJjbGllbnRlIn0sImFwcCI6IkNvbWFuZGEifQ.DnXqc4nplm0JeMt7d4FGNZ-cJucvl6L5tYHR3zPPUx0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "rol",
+									"value": "cliente",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "verificar token",
+							"host": [
+								"verificar token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cargar tokens",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "valentin",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "hola",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cliente",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/usuarios",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "carga datos csv",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "archivo",
+									"type": "file",
+									"src": "postman-cloud:///1ef2d981-2a09-4f10-b13b-4710bf5d1163"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/usuarios/csv",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"csv"
 							]
 						}
 					},

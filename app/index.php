@@ -52,41 +52,22 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
-    $group->post('/csv', function (Request $request, Response $response) {
-            $archivo = $request->getUploadedFiles();
-    
-            if (isset($archivo['file'])) {
-                $file = $archivo['file']->getClientFilename();
-
-                move_uploaded_file($file['tmp_name'],"Archivo/hola.csv");
-                // $csv = fopen($file->getClientFilename(), 'r');
-
-                // while(($usuario = fgetcsv($csv)) !== false){
-                //     echo ($usuario);
-                // }
-                // move_uploaded_file($name,"Archivo/hola.csv");
-
-            } else {
-                $response->getBody()->write("No se recibio nada");
-            }
-    
-            return $response;
-
-    });
 });
 
+//AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
 
     $group->get("/traer", \ProductoController::class . ":TraerUno")->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))->add(AutenticadorUsuario::class . ':verificarRolToken');
-    // ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))->add(AutenticadorUsuario::class . ':verificarRolToken')
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(UsuarioMW::class . ':ValidarRol')
     ->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 });
 
+//SI SE PIDE OTRO PRODUCTO LUEGO DE HABER PEDIDO ANTERIORMENTE EL ESTADO DEL PEDIDO SE CAMBIA Y LA MESA TAMBIEN (PREGUNTAR)
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
 

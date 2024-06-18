@@ -1,9 +1,10 @@
 <?php
 require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
+require_once './interfaces/IApiCsv.php';
 require_once './middlewares/AutentificadorJWT.php';
 
-class UsuarioController extends Usuario implements IApiUsable
+class UsuarioController extends Usuario implements IApiUsable, IApiCsv
 {
     public function CargarUno($request, $response, $args)
     {
@@ -23,6 +24,33 @@ class UsuarioController extends Usuario implements IApiUsable
 
     }
 
+    public static function CargarCsv($request, $response, $args)
+    {
+      $params = $request->getUploadFiles();
+      $archivo = fopen($params["file"]->getFilePath(), 'r');
+
+      while(($datos = fgetcsv($archivo)) !== false)
+      {
+        $usuario = new Usuario();
+        $usuario->nombre = $datos[0];
+        $usuario->clave = $datos[1];
+        $usuario->rol = $datos[2];
+
+        $usuario->crearUsuario();
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Lista cargada con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
+    }
+
+    public static function DescargarCsv($request, $response, $args)
+    {
+      
+    }
     public function CrearTokenUsuario($request, $response, $args)
     {
       $parametros = $request->getParsedBody();
