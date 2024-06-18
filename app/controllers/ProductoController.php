@@ -23,7 +23,7 @@ class ProductoController extends Producto implements IApiUsable
         $producto->estado_producto = $estado_producto;
         $producto->codigo_mesa = $codigo_mesa;
 
-        $producto->CrearProducto();
+        //$producto->CrearProducto();
 
         $payload = json_encode(array("mensaje" => "Producto creado con exito"));
         $response->getBody()->write($payload);

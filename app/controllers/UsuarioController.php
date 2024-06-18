@@ -1,6 +1,7 @@
 <?php
 require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 class UsuarioController extends Usuario implements IApiUsable
 {
@@ -18,9 +19,28 @@ class UsuarioController extends Usuario implements IApiUsable
         $usr->rol = $rol;
         $usr->crearUsuario();
 
-        $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
-        $response->getBody()->write($payload);
-        return $response->withHeader('Content-Type', 'application/json');
+        return self::CrearTokenUsuario($request, $response, $args);
+
+    }
+
+    public function CrearTokenUsuario($request, $response, $args)
+    {
+      $parametros = $request->getParsedBody();
+
+      $nombre = $parametros["nombre"];
+      $clave = $parametros["clave"];
+      $rol = $parametros['rol'];
+
+      $datos = array('nombre' => $nombre, 'clave' => $clave, 'rol' => $rol);
+
+      $token = AutentificadorJWT::CrearToken($datos);
+
+      $payload = json_encode(array('jwt' => $token));
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
     }
 
     public function TraerUno($request, $response, $args)

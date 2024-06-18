@@ -21,6 +21,8 @@ require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
 require_once "../app/middlewares/ProductoMW.php";
 require_once "../app/middlewares/PedidoMW.php";
+require_once "../app/middlewares/AutenticadorUsuario.php";
+//require_once "../app/middlewares/AutentificadorJWT.php";
 
 // Instantiate App
 $app = AppFactory::create();
@@ -49,6 +51,28 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
     $group->get("/traer", \UsuarioController::class . ":TraerUno");
 
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
+
+    $group->post('/csv', function (Request $request, Response $response) {
+            $archivo = $request->getUploadedFiles();
+    
+            if (isset($archivo['file'])) {
+                $file = $archivo['file']->getClientFilename();
+
+                move_uploaded_file($file['tmp_name'],"Archivo/hola.csv");
+                // $csv = fopen($file->getClientFilename(), 'r');
+
+                // while(($usuario = fgetcsv($csv)) !== false){
+                //     echo ($usuario);
+                // }
+                // move_uploaded_file($name,"Archivo/hola.csv");
+
+            } else {
+                $response->getBody()->write("No se recibio nada");
+            }
+    
+            return $response;
+
+    });
 });
 
 $app->group("/productos", function (RouteCollectorProxy $group){
@@ -56,8 +80,8 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->get("/traer", \ProductoController::class . ":TraerUno")->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))
-    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))->add(AutenticadorUsuario::class . ':verificarRolToken');
+    // ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(UsuarioMW::class . ':ValidarRol')
     ->add(ProductoMW::class . ':ValidarCodigoNoExistente');
