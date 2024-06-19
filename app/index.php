@@ -21,6 +21,7 @@ require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
 require_once "../app/middlewares/ProductoMW.php";
 require_once "../app/middlewares/PedidoMW.php";
+require_once "../app/middlewares/Logger.php";
 require_once "../app/middlewares/AutenticadorUsuario.php";
 //require_once "../app/middlewares/AutentificadorJWT.php";
 
@@ -45,6 +46,10 @@ $app->addBodyParsingMiddleware();
 //     return $response;
 // });
 
+$app->group("/sesion", function(RouteCollectorProxy $group){
+    $group->post('[/]', \Logger::class . ':Loguear');
+});
+
 $app->group("/usuarios", function (RouteCollectorProxy $group){
     $group->get('[/]', \UsuarioController::class . ':TraerTodos');
 
@@ -64,6 +69,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 //probar descargas csv
 //descarga pdfs
 //crear login
+//pedido tengo el cobro
 //AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
