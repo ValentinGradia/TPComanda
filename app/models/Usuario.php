@@ -7,17 +7,19 @@ class Usuario
     public $nombre;
     public $clave;
     public $rol;
+    public $fecha_baja;
 
     public function crearUsuario()
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(rol,nombre,clave) VALUES (:rol,:nombre,:clave)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO usuarios(rol,nombre,clave,fecha_baja) VALUES (:rol,:nombre,:clave,fecha_baja)");
+        $clavehash = password_hash($this->clave, PASSWORD_DEFAULT);
 
         $sql->bindValue(":rol", $this->rol, PDO::PARAM_STR);
         $sql->bindValue(":nombre", $this->nombre, PDO::PARAM_STR);
-        $sql->bindValue(":clave", $this->clave, PDO::PARAM_INT);
-
+        $sql->bindValue(":clave", $clavehash, PDO::PARAM_INT);
+        $sql->bindValue(":fecha_baja", null);
         $sql->execute();
     }
 
@@ -44,13 +46,12 @@ class Usuario
     public static function modificarUsuario($usuario)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET codigo_pedido = :codigo_pedido, rol = :rol,nombre=:nombre,
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET nombre=:nombre clave=:clave ,rol = :rol 
         clave=:clave WHERE id_usuario = :id_usuario");
-        $consulta->bindValue(":codigo_pedido", $usuario->codigo_pedido);
-        $consulta->bindValue(":rol", $usuario->rol);
+        $consulta->bindValue(":id_usuario", $usuario->id_usuario);
         $consulta->bindValue(":nombre", $usuario->nombre);
         $consulta->bindValue(":clave", $usuario->clave);
-        $consulta->bindValue(":id_usuario", $usuario->id_usuario);
+        $consulta->bindValue(":rol", $usuario->rol);
 
         $consulta->execute();
     }
@@ -58,10 +59,10 @@ class Usuario
     public static function borrarUsuario($usuario)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id_usuario = :id_usuario");
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fecha_baja = :fecha_baja WHERE id_usuario = :id_usuario");
         $fecha = new DateTime(date("d-m-Y"));
         $consulta->bindValue(':id_usuario', $usuario->id_usuario, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+        $consulta->bindValue(':fecha_baja', date_format($fecha, 'Y-m-d H:i:s'));
         $consulta->execute();
     }
     

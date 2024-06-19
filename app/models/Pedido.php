@@ -16,10 +16,10 @@ class Pedido
     {
         $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO pedidos(codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,nombre_cliente) VALUES (:codigo_mesa,:codigo_pedido,:estado_pedido,:tiempo_preparacion,:nombre_cliente)");
+        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO pedidos(codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,nombre_cliente) VALUES (:codigo_pedido,:codigo_mesa,:estado_pedido,:tiempo_preparacion,:nombre_cliente)");
 
-        $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
         $sql->bindValue(":codigo_pedido", $this->codigo_pedido);
+        $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
         $sql->bindValue(":estado_pedido", $this->estado_pedido, PDO::PARAM_STR);
         $sql->bindValue(":tiempo_preparacion",$this->tiempo_preparacion);
         $sql->bindValue(":nombre_cliente", $this->nombre_cliente, PDO::PARAM_STR);
@@ -30,7 +30,7 @@ class Pedido
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,
         nombre_cliente FROM pedidos");
         $consulta->execute();
 
@@ -41,7 +41,7 @@ class Pedido
     public static function obtenerPedido($codigo_pedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa,codigo_pedido,estado_pedido,tiempo_preparacion,
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,
         nombre_cliente FROM pedidos WHERE codigo_pedido = :codigo_pedido");
         $consulta->bindValue(':codigo_pedido', $codigo_pedido, PDO::PARAM_INT);
         $consulta->execute();

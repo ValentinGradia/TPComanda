@@ -21,6 +21,49 @@ class MesaController extends Mesa implements IApiUsable
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public static function CargarCsv($request, $response, $args)
+    {
+      $params = $request->getUploadedFiles();
+      $archivo = fopen($params["file"]->getFilePath(), 'r');
+
+      while(($datos = fgetcsv($archivo)) !== false)
+      {
+        $mesa = new Mesa();
+        $mesa->codigo_mesa = $datos[0];
+        $mesa->estado_mesa = $datos[1];
+
+        $mesa->CrearMesa();
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Lista cargada con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
+    }
+
+    public static function DescargarCsv($request, $response, $args)
+    {
+      $mesas = Mesa::obtenerTodos();
+      $ruta = "./Csv/mesa.csv";
+
+      $archivo = fopen($ruta, 'w');
+
+      fputcsv($archivo, array('codigo_mesa','estado_mesa'));
+      foreach($mesas as $mesa)  
+      {
+        fputcsv($archivo, array($mesa->codigo_mesa,$mesa->esado_mesa));
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Archivo cargado con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+      
+    }
+
     public function TraerUno($request, $response, $args)
     {
       $params = $request->getQueryParams();

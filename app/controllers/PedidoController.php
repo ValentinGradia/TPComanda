@@ -27,6 +27,54 @@ class PedidoController extends Pedido implements IApiUsable
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public static function CargarCsv($request, $response, $args)
+    {
+      $params = $request->getUploadedFiles();
+      $archivo = fopen($params["file"]->getFilePath(), 'r');
+
+      while(($datos = fgetcsv($archivo)) !== false)
+      {
+        $pedido = new Pedido();
+        $pedido->codigo_pedido = $datos[0];
+        $pedido->codigo_mesa = $datos[1];
+        $pedido->estado_pedido = $datos[2];
+        $pedido->tiempo_preparacion = $datos[3];
+        $pedido->tiempo_entrega = $datos[4];
+        $pedido->nombre_cliente = $datos[5];
+
+        $pedido->crearPedido();
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Lista cargada con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
+    }
+
+    public static function DescargarCsv($request, $response, $args)
+    {
+      $pedidos = Pedido::obtenerTodos();
+      $ruta = "./Csv/pedidos.csv";
+
+      $archivo = fopen($ruta, 'w');
+
+      fputcsv($archivo, array('codigo_pedido', 'codigo_mesa', 'estado', 'tiempo_preparacion', 'tiempo_entrega', 'nombre_cliente'));
+      foreach($pedidos as $pedido)  
+      {
+        fputcsv($archivo, array($pedido->codigo_pedido, $pedido->codigo_mesa, $pedido->estado_pedido, $pedido->tiempo_preparacion,
+        $pedido->tiempo_entrega,$pedido->nombre_cliente));
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Archivo cargado con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+      
+    }
+
     public function TraerUno($request, $response, $args)
     {
         $params = $request->getQueryParams();

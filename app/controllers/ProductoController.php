@@ -30,6 +30,54 @@ class ProductoController extends Producto implements IApiUsable
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public static function CargarCsv($request, $response, $args)
+    {
+      $params = $request->getUploadedFiles();
+      $archivo = fopen($params["file"]->getFilePath(), 'r');
+
+      while(($datos = fgetcsv($archivo)) !== false)
+      {
+        $producto = new Producto();
+        $producto->tipo = $datos[0];
+        $producto->nombre = $datos[1];
+        $producto->precio = $datos[2];
+        $producto->cantidad = $datos[3];
+        $producto->estado_producto = $datos[4];
+        $producto->codigo_mesa = $datos[5];
+
+        $producto->CrearProducto();
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Lista cargada con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
+    }
+
+    public static function DescargarCsv($request, $response, $args)
+    {
+      $productos = Producto::obtenerTodos();
+      $ruta = "./Csv/productos.csv";
+
+      $archivo = fopen($ruta, 'w');
+
+      fputcsv($archivo, array('Id', 'tipo', 'nombre', 'precio', 'cantidad', 'estado', 'codigo_mesa'));
+      foreach($productos as $producto)  
+      {
+        fputcsv($archivo, array($producto->id_producto, $producto->tipo, $producto->nombre, $producto->precio, $producto->cantidad,
+        $producto->estado_producto,$producto->codigo_mesa));
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Archivo cargado con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+      
+    }
+
     public function TraerUno($request, $response, $args)
     {
         $params = $request->getQueryParams();

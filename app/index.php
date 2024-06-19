@@ -50,10 +50,20 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get("/traer", \UsuarioController::class . ":TraerUno");
 
+    $group->get("/csv", \UsuarioController::class. ':DescargarCsv');
+
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
-});
+    $group->post("/csv",\UsuarioController::class . ':CargarCsv');
 
+});
+//Guardar token en variable
+//deshashear contraseña
+//traer tiempo restante
+//guardar foto cliente
+//probar descargas csv
+//descarga pdfs
+//crear login
 //AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");

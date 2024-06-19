@@ -26,7 +26,7 @@ class UsuarioController extends Usuario implements IApiUsable, IApiCsv
 
     public static function CargarCsv($request, $response, $args)
     {
-      $params = $request->getUploadFiles();
+      $params = $request->getUploadedFiles();
       $archivo = fopen($params["file"]->getFilePath(), 'r');
 
       while(($datos = fgetcsv($archivo)) !== false)
@@ -49,6 +49,22 @@ class UsuarioController extends Usuario implements IApiUsable, IApiCsv
 
     public static function DescargarCsv($request, $response, $args)
     {
+      $usuarios = Usuario::obtenerTodos();
+      $ruta = "./Csv/usuarios.csv";
+
+      $archivo = fopen($ruta, 'w');
+
+      fputcsv($archivo, array('Id', 'nombre', 'clave', 'rol', 'fecha_baja'));
+      foreach($usuarios as $usuario)  
+      {
+        fputcsv($archivo, array($usuario->id_usuario, $usuario->nombre, $usuario->clave, $usuario->fecha_baja));
+      }
+
+      fclose($archivo);
+      $payload = json_encode(array("mensaje" => "Archivo cargado con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
       
     }
     public function CrearTokenUsuario($request, $response, $args)
