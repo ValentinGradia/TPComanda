@@ -30,13 +30,57 @@ class UsuarioController implements IApiUsable
       ->withHeader('Content-Type', 'application/json');
   }
 
+  public static function CargarCsv($request, $response, $args)
+  {
+    $params = $request->getUploadedFiles();
+    $archivo = fopen($params["file"]->getFilePath(), 'r');
+
+    while(($datos = fgetcsv($archivo)) !== false)
+    {
+      $usuario = new Usuario();
+      $usuario->nombre = $datos[0];
+      $usuario->clave = password_hash($datos[1],PASSWORD_DEFAULT);
+      $usuario->rol = $datos[2];
+      $usuario->estado = $datos[3];
+
+      $usuario->save();
+    }
+
+    fclose($archivo);
+    $payload = json_encode(array("mensaje" => "Lista cargada con exito"));
+    $response->getBody()->write($payload);
+    return $response
+      ->withHeader('Content-Type', 'application/json');
+  }
+
+  public static function DescargarCsv($request, $response, $args)
+  {
+    $usuarios = Usuario::all();
+    $ruta = "./Csv/usuarios.csv";
+
+    $archivo = fopen($ruta, 'w');
+
+    fputcsv($archivo, array('Id', 'nombre', 'clave', 'rol', 'estado', 'fecha_baja'));
+    foreach($usuarios as $usuario)  
+    {
+      fputcsv($archivo, array($usuario->id_usuario, $usuario->nombre, $usuario->clave, $usuario->rol, $usuario->estado,
+      $usuario->fecha_baja));
+    }
+
+    fclose($archivo);
+    $payload = json_encode(array("mensaje" => "Archivo cargado con exito"));
+    $response->getBody()->write($payload);
+    return $response
+      ->withHeader('Content-Type', 'application/json');
+    
+  }
+
   public function TraerUno($request, $response, $args)
   {
     $parametros = $request->getQueryParams();
     $id_usuario = $parametros['id_usuario'];
 
     $usuario = Usuario::find($id_usuario); //el find se usa exclusivamente para buscar por claves primarias (id)
-    
     $payload = json_encode($usuario);
 
     $response->getBody()->write($payload);
@@ -93,7 +137,7 @@ class UsuarioController implements IApiUsable
     if($usuario !== null)
     {
       $usuario->estado = "inactivo";
-      $usuario->fecha_baja = date('Y-m-d H:i');
+      $usuario->fecha_baja = date('Y-m-d H:i:s');
       $usuario->delete();
     }
     

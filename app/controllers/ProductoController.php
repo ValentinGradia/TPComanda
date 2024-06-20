@@ -2,6 +2,8 @@
 require_once './models/Producto.php';
 require_once './interfaces/IApiUsable.php';
 
+use \App\Models\Producto as Producto;
+
 class ProductoController extends Producto implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
@@ -23,7 +25,7 @@ class ProductoController extends Producto implements IApiUsable
         $producto->estado_producto = $estado_producto;
         $producto->codigo_mesa = $codigo_mesa;
 
-        //$producto->CrearProducto();
+        $producto->save();
 
         $payload = json_encode(array("mensaje" => "Producto creado con exito"));
         $response->getBody()->write($payload);
@@ -44,8 +46,9 @@ class ProductoController extends Producto implements IApiUsable
         $producto->cantidad = $datos[3];
         $producto->estado_producto = $datos[4];
         $producto->codigo_mesa = $datos[5];
+        $producto->id_empleado = $datos[6];
 
-        $producto->CrearProducto();
+        $producto->save();
       }
 
       fclose($archivo);
@@ -63,11 +66,11 @@ class ProductoController extends Producto implements IApiUsable
 
       $archivo = fopen($ruta, 'w');
 
-      fputcsv($archivo, array('Id', 'tipo', 'nombre', 'precio', 'cantidad', 'estado', 'codigo_mesa'));
+      fputcsv($archivo, array('Id', 'tipo', 'nombre', 'precio', 'cantidad', 'estado', 'codigo_mesa','id_empleado'));
       foreach($productos as $producto)  
       {
         fputcsv($archivo, array($producto->id_producto, $producto->tipo, $producto->nombre, $producto->precio, $producto->cantidad,
-        $producto->estado_producto,$producto->codigo_mesa));
+        $producto->estado_producto,$producto->codigo_mesa, $producto->id_empleado));
       }
 
       fclose($archivo);
@@ -82,7 +85,7 @@ class ProductoController extends Producto implements IApiUsable
     {
         $params = $request->getQueryParams();
         $id_producto = $params['id_producto'];
-        $producto = Producto::ObtenerProducto($id_producto);
+        $producto = Producto::find($id_producto);
         $payload = json_encode($producto);
 
         $response->getBody()->write($payload);
@@ -92,7 +95,7 @@ class ProductoController extends Producto implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $lista = Producto::ObtenerTodos();
+        $lista = Producto::all();
         $payload = json_encode(array("listaProductos" => $lista));
 
         $response->getBody()->write($payload);
@@ -104,18 +107,24 @@ class ProductoController extends Producto implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $producto = Producto::ObtenerProducto($parametros["id_producto"]);
+        $producto = Producto::find($parametros["id_producto"]);
 
-        $producto->tipo = !empty($parametros["tipo"]) ? $parametros["tipo"] : $producto->tipo;
-        $producto->nombre = !empty($parametros["nombre"]) ? $parametros["nombre"] : $producto->nombre;
-        $producto->precio = !empty($parametros["precio"]) ? $parametros["precio"] : $producto->precio;
-        $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
-        $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
-        $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
+        if($producto !== null)
+        {
+          $producto->tipo = !empty($parametros["tipo"]) ? $parametros["tipo"] : $producto->tipo;
+          $producto->nombre = !empty($parametros["nombre"]) ? $parametros["nombre"] : $producto->nombre;
+          $producto->precio = !empty($parametros["precio"]) ? $parametros["precio"] : $producto->precio;
+          $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
+          $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
+          $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
+          $producto->id_empleado = !empty($parametros["id_empleado"]) ? $parametros["id_empleado"] : $producto->id_empleado;
+  
+          $producto->save();
+  
+          $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
 
-        Producto::modificarProducto($producto);
-
-        $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
+        }
+        else{$payload = json_encode(array("mensaje" => "Producto no encontrado"));}
 
         $response->getBody()->write($payload);
         return $response
@@ -126,10 +135,14 @@ class ProductoController extends Producto implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $producto = Producto::ObtenerProducto($parametros["id_producto"]);
-        Producto::borrarProducto($producto);
+        $producto = Producto::find($parametros["id_producto"]);
 
-        $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
+        if($producto !== null)
+        {
+          $producto->delete();
+          $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
+        }
+        else{$payload = json_encode(array("mensaje" => "Producto no encontrado"));}
 
         $response->getBody()->write($payload);
         return $response

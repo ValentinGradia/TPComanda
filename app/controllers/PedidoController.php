@@ -2,6 +2,8 @@
 require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 
+use \App\Models\Pedido as Pedido;
+
 class PedidoController extends Pedido implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
@@ -11,17 +13,20 @@ class PedidoController extends Pedido implements IApiUsable
         $codigo_mesa = $parametros['codigo_mesa'];
         $codigo_pedido = $parametros['codigo_pedido'];
         $estado_pedido = $parametros["estado_pedido"];
+        $tiempo_inicio = date('Y-m-d H:i');
+        $tiempo_estimado_entregado = $parametros["tiempo_estimado_entregado"];
         $nombre_cliente = $parametros["nombre_cliente"];
-        $tiempo_preparacion = $parametros["tiempo_preparacion"];
 
         $pedido = new Pedido();
         $pedido->codigo_mesa = $codigo_mesa;
         $pedido->codigo_pedido = $codigo_pedido;
         $pedido->estado_pedido = $estado_pedido;
+        $pedido->tiempo_inicio = $tiempo_inicio;
+        $pedido->tiempo_estimado_entregado = $tiempo_estimado_entregado;
         $pedido->nombre_cliente = $nombre_cliente;
-        $pedido->tiempo_preparacion = $tiempo_preparacion;
 
-        $pedido->crearPedido();
+
+        $pedido->save();
         $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -38,11 +43,11 @@ class PedidoController extends Pedido implements IApiUsable
         $pedido->codigo_pedido = $datos[0];
         $pedido->codigo_mesa = $datos[1];
         $pedido->estado_pedido = $datos[2];
-        $pedido->tiempo_preparacion = $datos[3];
-        $pedido->tiempo_entrega = $datos[4];
+        $pedido->tiempo_inicio = $datos[3];
+        $pedido->tiempo_estimado_entregado = $datos[4];
         $pedido->nombre_cliente = $datos[5];
 
-        $pedido->crearPedido();
+        $pedido->save();
       }
 
       fclose($archivo);
@@ -60,11 +65,12 @@ class PedidoController extends Pedido implements IApiUsable
 
       $archivo = fopen($ruta, 'w');
 
-      fputcsv($archivo, array('codigo_pedido', 'codigo_mesa', 'estado', 'tiempo_preparacion', 'tiempo_entrega', 'nombre_cliente'));
+      fputcsv($archivo, array('codigo_pedido', 'codigo_mesa', 'estado', 'tiempo_inicio', 'tiempo_estimado_entregado','tiempo_entregado', 'nombre_cliente',
+      'cobro','fecha_baja'));
       foreach($pedidos as $pedido)  
       {
-        fputcsv($archivo, array($pedido->codigo_pedido, $pedido->codigo_mesa, $pedido->estado_pedido, $pedido->tiempo_preparacion,
-        $pedido->tiempo_entrega,$pedido->nombre_cliente));
+        fputcsv($archivo, array($pedido->codigo_pedido, $pedido->codigo_mesa, $pedido->estado_pedido, $pedido->tiempo_inicio,$pedido->tiempo_estimado_entregado,
+        $pedido->tiempo_entregado,$pedido->nombre_cliente,$pedido->nombre_cliente,$pedido->fecha_baja));
       }
 
       fclose($archivo);
@@ -79,7 +85,7 @@ class PedidoController extends Pedido implements IApiUsable
     {
         $params = $request->getQueryParams();
         $codigo_pedido = $params['codigo_pedido'];
-        $pedido = Pedido::obtenerPedido($codigo_pedido);
+        $pedido = Pedido::find($codigo_pedido);
         $payload = json_encode($pedido);
 
         $response->getBody()->write($payload);
@@ -101,7 +107,7 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $lista = Pedido::obtenerTodos();
+        $lista = Pedido::all();
         $payload = json_encode(array("listaPedidos" => $lista));
 
         $response->getBody()->write($payload);
@@ -112,14 +118,17 @@ class PedidoController extends Pedido implements IApiUsable
     public function ModificarUno($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
-        $pedido = Pedido::obtenerPedido($parametros["codigo_pedido"]);
+        $pedido = Pedido::find($parametros["codigo_pedido"]);
 
         $pedido->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $pedido->codigo_mesa;
         $pedido->estado_pedido = !empty($parametros["estado_pedido"]) ? $parametros["estado_pedido"] : $pedido->estado_pedido;
-        $pedido->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $pedido->tiempo_preparacion;
-        $pedido->tiempo_entrega = !empty($parametros["tiempo_entrega"]) ? $parametros["tiempo_entrega"] : $pedido->tiempo_entrega;
+        $pedido->tiempo_inicio = !empty($parametros["tiempo_inicio"]) ? $parametros["tiempo_inicio"] : $pedido->tiempo_inicio;
+        $pedido->tiempo_estimado_entregado = !empty($parametros["tiempo_estimado_entregado"]) ? $parametros["tiempo_estimado_entregado"] : $pedido->tiempo_estimado_entregado;
+        $pedido->tiempo_entregado = !empty($parametros["tiempo_entregado"]) ? $parametros["tiempo_entregado"] : $pedido->tiempo_entregado;
         $pedido->nombre_cliente = !empty($parametros["nombre_cliente"]) ? $parametros["nombre_cliente"] : $pedido->nombre_cliente;
-        Pedido::modificarPedido($pedido);
+        $pedido->cobro = !empty($parametros["cobro"]) ? $parametros["cobro"] : $pedido->cobro;
+        $pedido->fecha_baja = !empty($parametros["fecha_baja"]) ? $parametros["fecha_baja"] : $pedido->fecha_baja;
+        $pedido->save();
 
         $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));
 
@@ -131,9 +140,10 @@ class PedidoController extends Pedido implements IApiUsable
     public function BorrarUno($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
-        $pedido = Pedido::obtenerPedido($parametros["codigo_pedido"]);
+        $pedido = Pedido::find($parametros["codigo_pedido"]);
 
-        Pedido::borrarPedido($pedido);
+        $pedido->fecha_baja = date('Y-m-d H:i:s');
+        $pedido->delete();
         
         $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
 

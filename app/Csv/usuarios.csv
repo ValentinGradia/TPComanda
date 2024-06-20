@@ -1,0 +1,7 @@
+Id,nombre,clave,rol,estado,fecha_baja
+1,valentin,$2y$10$m5Ggf6MODGqZV1INrxeiCOcxkajvxMIQVDMFl3HZFzf0M59PKnNu6,admin,activo,
+3,eugenia,$2y$10$T6DRKEbknF4B/9k41NlgE.74uziE.JCF7ZBujetuzMcZ7Njs50h5a,cocinero,activo,
+4,martin,$2y$10$/JdFbD6T7YcEhi7o9wy64OlfvlHod6d3RIz0.KVMS.fg2LUBaIgI6,socio,activo,
+6,fernando,$2y$10$eNGKnUZaJSzMXdMXi4kpbuJ9iOiULc3Aj4PQvrMRd5ObdHwfOY2Oq,bartender,activo,
+9,eusebio,$2y$10$yll/wVAXWitJ8mcMyZsH3eTHWPaAr9Hv3eqQc1D.DiojuedyQ2CKW,bartender,activo,
+10,martin,$2y$10$8tTkgeJfX5MTsd0Snsxn2erc2yi2yVAf2r5iE8OzhdyLFYr83jrp6,cocinero,activo,

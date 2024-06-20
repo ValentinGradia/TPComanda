@@ -1,64 +1,24 @@
 <?php
-require_once "Pedido.php";
-require_once "../app/db/AccesoDatos.php";
 
-class Mesa
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Mesa extends Model //todos los modelos tienen que heredar del Model de eloquent
 {
-    public $codigo_mesa;
-    public $foto_mesa;
-    public $estado_mesa;
+    use SoftDeletes; //para que interprete que hacemos softdeletes
 
-    public function CrearMesa()
-    {
-        $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
+    protected $primaryKey = 'codigo_mesa';
+    protected $table = 'mesas'; //nombre de nuestra tabla
+    public $incrementing = false; //refiere a la clave primaria
+    public $timestamps = false;//eloquent por default asume que la tabla tiene una columna de cuando fue creado y updateado, ponemos en false
+    //para que no suceda
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO mesas(codigo_mesa,estado_mesa) VALUES (:codigo_mesa,:estado_mesa)");
+    const DELETED_AT = 'fecha_baja';
 
-        $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
-        $sql->bindValue(":estado_mesa", $this->estado_mesa, PDO::PARAM_STR);
-
-        $sql->execute();
-    }
-
-    public static function ObtenerTodos()
-    {
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas");
-        $consulta->execute();
-
-        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
-    
-    }
-
-    public static function ObtenerMesa($codigo_mesa)
-    {
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_mesa, estado_mesa FROM mesas WHERE codigo_mesa = :codigo_mesa");
-        $consulta->bindValue(':codigo_mesa', $codigo_mesa, PDO::PARAM_INT);
-
-        $consulta->execute();
-
-        return $consulta->fetchObject('Mesa');
-    }
-
-    public static function modificarMesa($mesa)
-    {
-        $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET estado_mesa = :estado_mesa WHERE codigo_mesa = :codigo_mesa");
-        $consulta->bindValue(":codigo_mesa", $mesa->codigo_mesa);
-        $consulta->bindValue(":estado_mesa", $mesa->estado_mesa);
-
-        $consulta->execute();
-    }
-
-
-    public static function borrarMesa($mesa)
-    {
-        $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE mesas SET fechaBaja = :fechaBaja WHERE codigo_mesa = :id");
-        $fecha = new DateTime(date("d-m-Y"));
-        $consulta->bindValue(':id', $mesa->codigo_mesa, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
-        $consulta->execute();
-    }
+    //
+    protected $fillable = [
+        'codigo_mesa', 'estado_mesa','fecha_baja'
+    ];
 }

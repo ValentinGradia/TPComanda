@@ -1,77 +1,25 @@
 <?php
 
-require_once "Producto.php";
-require_once "../app/db/AccesoDatos.php";
+namespace App\Models;
 
-class Pedido 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Pedido extends Model //todos los modelos tienen que heredar del Model de eloquent
 {
-    public $codigo_mesa;
-    public $codigo_pedido;
-    public $estado_pedido;
-    public $tiempo_preparacion;
-    public $tiempo_entrega;
-    public $nombre_cliente;
+    use SoftDeletes; //para que interprete que hacemos softdeletes
 
-    public function crearPedido()
-    {
-        $objetoAccesoDatos = AccesoDatos::obtenerInstancia();
+    protected $primaryKey = 'codigo_pedido';
+    protected $table = 'pedidos'; //nombre de nuestra tabla
+    public $incrementing = false; //refiere a la clave primaria
+    public $timestamps = false;//eloquent por default asume que la tabla tiene una columna de cuando fue creado y updateado, ponemos en false
+    //para que no suceda
 
-        $sql = $objetoAccesoDatos->prepararConsulta("INSERT INTO pedidos(codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,nombre_cliente) VALUES (:codigo_pedido,:codigo_mesa,:estado_pedido,:tiempo_preparacion,:nombre_cliente)");
+    const DELETED_AT = 'fecha_baja';
 
-        $sql->bindValue(":codigo_pedido", $this->codigo_pedido);
-        $sql->bindValue(":codigo_mesa",$this->codigo_mesa, PDO::PARAM_INT);
-        $sql->bindValue(":estado_pedido", $this->estado_pedido, PDO::PARAM_STR);
-        $sql->bindValue(":tiempo_preparacion",$this->tiempo_preparacion);
-        $sql->bindValue(":nombre_cliente", $this->nombre_cliente, PDO::PARAM_STR);
-
-        $sql->execute();
-    }
-
-    public static function obtenerTodos()
-    {
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,
-        nombre_cliente FROM pedidos");
-        $consulta->execute();
-
-        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
-    
-    }
-
-    public static function obtenerPedido($codigo_pedido)
-    {
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigo_pedido,codigo_mesa,estado_pedido,tiempo_preparacion,
-        nombre_cliente FROM pedidos WHERE codigo_pedido = :codigo_pedido");
-        $consulta->bindValue(':codigo_pedido', $codigo_pedido, PDO::PARAM_INT);
-        $consulta->execute();
-
-        return $consulta->fetchObject('Pedido');
-    }
-
-    public static function modificarPedido($pedido)
-    {
-        $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $sql = $objAccesoDato->prepararConsulta("UPDATE pedidos SET codigo_mesa=:codigo_mesa, estado_pedido=:estado_pedido,
-        tiempo_preparacion=:tiempo_preparacion, tiempo_entrega=:tiempo_entrega, nombre_cliente=:nombre_cliente WHERE codigo_pedido = :codigo_pedido");
-
-        $sql->bindValue(":codigo_mesa",$pedido->codigo_mesa, PDO::PARAM_INT);
-        $sql->bindValue(":codigo_pedido", $pedido->codigo_pedido, PDO::PARAM_INT);
-        $sql->bindValue(":estado_pedido", $pedido->estado_pedido, PDO::PARAM_STR);
-        $sql->bindValue(":tiempo_preparacion",$pedido->tiempo_preparacion);
-        $sql->bindValue(":tiempo_entrega", $pedido->tiempo_entrega);
-        $sql->bindValue(":nombre_cliente", $pedido->nombre_cliente, PDO::PARAM_STR);
-
-        $sql->execute();
-    }
-
-    public static function borrarPedido($pedido)
-    {
-        $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE pedidos SET fechaBaja = :fechaBaja WHERE codigo_pedido = :id");
-        $fecha = new DateTime(date("d-m-Y"));
-        $consulta->bindValue(':id', $pedido->codigo_pedido, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
-        $consulta->execute();
-    }
+    //
+    protected $fillable = [
+        'codigo_pedido', 'codigo_mesa', 'estado_pedido', 'tiempo_inicio', 'tiempo_estimado_entregado', 'tiempo_entregado','nombre_cliente',
+        'cobro','fecha_baja'
+    ];
 }
