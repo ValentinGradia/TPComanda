@@ -8,6 +8,10 @@ require_once './interfaces/IApiCampos.php';
 require_once './models/Producto.php';
 require_once './models/Pedido.php';
 
+use \App\Models\Pedido as Pedido;
+use \App\Models\Producto as Producto;
+
+
 
 
 
@@ -38,7 +42,7 @@ class PedidoMW implements IApiCampos
         $response = new ResponseClass();
         $params = $request->getParsedBody();
 
-        if(Pedido::obtenerPedido($params["codigo_pedido"]))
+        if(Pedido::where('codigo_pedido',$params["codigo_pedido"]))
         {
             $response->getBody()->write(json_encode(array("error" => "esa codigo ya existe")));
         }
@@ -58,7 +62,7 @@ class PedidoMW implements IApiCampos
         $bodyParams = $request->getParsedBody();
         $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
-        if(Pedido::obtenerPedido($params["codigo_pedido"]))
+        if(Pedido::where('codigo_pedido',$params["codigo_pedido"]))
         {
             $response = $handler->handle($request);
         }
@@ -73,14 +77,14 @@ class PedidoMW implements IApiCampos
     public static function ValidarProductosListos(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
-        parse_str(file_get_contents("php://input"), $params);
+        $params = $request->getParsedBody();
 
         $codigo_pedido = $params["codigo_pedido"];
 
         $pedido = Pedido::obtenerPedido($codigo_pedido);
         $codigo_mesa = $pedido->codigo_mesa;
 
-        $productos = Producto::ObtenerTodos();
+        $productos = Producto::all();
 
         $flag = true;
         //validar que los productos esten listos para poder servir el pedido
@@ -99,6 +103,7 @@ class PedidoMW implements IApiCampos
         if($flag)
         {
             $pedido->estado_pedido = "listo para servir";
+            $pedido->tiempo_entregado = date('Y-m-d H:i');
             $response = $handler->handle($request);
         }
         else

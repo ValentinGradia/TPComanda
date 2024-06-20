@@ -1,6 +1,7 @@
 <?php
 require_once './models/Producto.php';
 require_once './interfaces/IApiUsable.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Producto as Producto;
 
@@ -14,7 +15,7 @@ class ProductoController extends Producto implements IApiUsable
         $nombre = $parametros["nombre"];
         $precio = $parametros["precio"];
         $cantidad = $parametros["cantidad"];
-        $estado_producto = $parametros["estado_producto"];
+        $estado_producto = 'pendiente';
         $codigo_mesa = $parametros["codigo_mesa"];
 
         $producto = new Producto();
@@ -109,6 +110,11 @@ class ProductoController extends Producto implements IApiUsable
 
         $producto = Producto::find($parametros["id_producto"]);
 
+        $header = $request->getHeaderLine('Authorization');
+
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
+
         if($producto !== null)
         {
           $producto->tipo = !empty($parametros["tipo"]) ? $parametros["tipo"] : $producto->tipo;
@@ -117,7 +123,7 @@ class ProductoController extends Producto implements IApiUsable
           $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
           $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
           $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
-          $producto->id_empleado = !empty($parametros["id_empleado"]) ? $parametros["id_empleado"] : $producto->id_empleado;
+          $producto->id_empleado = $datos->id_usuario;
   
           $producto->save();
   

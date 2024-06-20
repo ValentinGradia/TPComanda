@@ -5,6 +5,8 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
 use function PHPSTORM_META\map;
+use \App\Models\Mesa as Mesa;
+use \App\Models\Producto as Producto;
 
 require_once './interfaces/IApiCampos.php';
 require_once './models/Producto.php';
@@ -19,7 +21,7 @@ class ProductoMW implements IApiCampos
 
         $params = $request->getParsedBody();
 
-        if(isset($params["tipo"], $params["nombre"], $params["precio"], $params["cantidad"], $params["estado_producto"]))
+        if(isset($params["tipo"], $params["nombre"], $params["precio"], $params["cantidad"],$params["codigo_mesa"])) 
         {
             $response = $handler->handle($request);
         }
@@ -38,7 +40,7 @@ class ProductoMW implements IApiCampos
         $bodyParams = $request->getParsedBody();
         $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
-        if(Mesa::ObtenerMesa($params["id_producto"]))
+        if(Mesa::find($params["id_producto"]))
         {
             $response = $handler->handle($request);
         }
@@ -56,7 +58,7 @@ class ProductoMW implements IApiCampos
         $params = $request->getParsedBody();
         $codigo_mesa = $params["codigo_mesa"];
         
-        $productos = Producto::ObtenerProductosCodigoMesa($codigo_mesa);
+        $productos = Producto::where('cdigo_mesa',$codigo_mesa)->first();
 
         $productosPendientes = array_filter($productos, function($producto){
             return $producto->estado_producto == "pendiente";
@@ -73,7 +75,6 @@ class ProductoMW implements IApiCampos
         }
 
         return $response;
-
 
     }
 

@@ -5,6 +5,8 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
 
+use \App\Models\Producto as Producto;
+
 require_once './models/Producto.php';
 require_once './middlewares/AutentificadorJWT.php';
 
@@ -44,12 +46,15 @@ class UsuarioMW
 
     public static function ValidarCambioEstadoProducto(Request $request, RequestHandler $handler)
     {
-        parse_str(file_get_contents("php://input"), $params);
+        $params = $request->getParsedBody();
 
         $response = new ResponseClass();
-        $rol = $params["rol"];
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
+        $rol = $datos->rol;
 
-        $producto = Producto::ObtenerProducto($params["id_producto"]);
+        $producto = Producto::find($params["id_producto"]);
         $tipo_producto = $producto->tipo;
 
         //validar que el producto ingresado este pendiente
@@ -110,7 +115,6 @@ class UsuarioMW
         $response = new ResponseClass();
 
         $params = $request->getParsedBody();
-
 
         if(isset($params["rol"]))
         {

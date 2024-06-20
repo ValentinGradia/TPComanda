@@ -85,21 +85,19 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 //guardar foto cliente
 //hacer encuesta
 //descarga pdfs
-//pedido tenga el cobro
 //AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
 
     $group->get("/traer", \ProductoController::class . ":TraerUno")->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))->add(AutenticadorUsuario::class . ':verificarRolToken')
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
-    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(UsuarioMW::class . ':ValidarRol')
-    ->add(ProductoMW::class . ':ValidarCodigoNoExistente');
-});
+    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
+})->add(Logger::class . ':ValidarSesion');
 
-//SI SE PIDE OTRO PRODUCTO LUEGO DE HABER PEDIDO ANTERIORMENTE EL ESTADO DEL PEDIDO SE CAMBIA Y LA MESA TAMBIEN (PREGUNTAR)
+
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
 
@@ -111,9 +109,9 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
     ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
-    ->add(new UsuarioMW("mozo"))->add(UsuarioMW::class . ':ValidarRol')
+    ->add(new UsuarioMW("mozo"))
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente');
-});
+})->add(Logger::class . ':ValidarSesion');
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->get('[/]', \MesaController::class . ':TraerTodos');
@@ -126,6 +124,6 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
     ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente')->add(MesaMW::class . ':ValidarCodigoNoExistente');
-});
+})->add(Logger::class . ':ValidarSesion');
 
 $app->run();
