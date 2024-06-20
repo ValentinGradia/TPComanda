@@ -17,6 +17,7 @@ require_once "../app/controllers/MesaController.php";
 require_once "../app/controllers/UsuarioController.php";
 require_once "../app/controllers/PedidoController.php";
 require_once "../app/controllers/ProductoController.php";
+require_once "../app/controllers/EncuestaController.php";
 require_once "../app/db/AccesoDatos.php";
 require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
@@ -85,16 +86,20 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 //guardar foto cliente
 //hacer encuesta
 //descarga pdfs
-//AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
 
     $group->get("/traer", \ProductoController::class . ":TraerUno")->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
+    $group->get("/csv", \ProductoController::class. ':DescargarCsv');
+
     $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
+
+    $group->post("/csv",\ProductoController::class . ':CargarCsv');
+
 })->add(Logger::class . ':ValidarSesion');
 
 
@@ -103,14 +108,18 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \PedidoController::class . ":TraerUno")->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
+    $group->get("/csv", \PedidoController::class. ':DescargarCsv');
+
     $group->post("[/]", \PedidoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarEstadoProducto')
     ->add(MesaMW::class . ':ValidarEstadoMesa')->add(PedidoMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
 
     $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
-    ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
-    ->add(new UsuarioMW("mozo"))
-    ->add(PedidoMW::class . ':ValidarCodigoNoExistente');
+    ->add(AutenticadorUsuario::class . ':verificarRolToken')
+    ->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCodigoNoExistente');
+
+    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+
 })->add(Logger::class . ':ValidarSesion');
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
@@ -118,12 +127,22 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
+    $group->get("/csv", \MesaController::class. ':DescargarCsv');
+
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCampos');
 
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
-    ->add(AutenticadorUsuario::class . ':verificarClave')->add(AutenticadorUsuario::class . ':verificarRolToken')
+    ->add(AutenticadorUsuario::class . ':verificarRolToken')
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente')->add(MesaMW::class . ':ValidarCodigoNoExistente');
+
+    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+
 })->add(Logger::class . ':ValidarSesion');
+
+$app->group("/encuesta", function (RouteCollectorProxy $group){
+    $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'))->add(MesaMW::class . ':ValidarCodigoNoExistente');
+
+});
 
 $app->run();

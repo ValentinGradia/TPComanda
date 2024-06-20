@@ -12,9 +12,6 @@ use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
 
 
-
-
-
 class PedidoMW implements IApiCampos
 {
     public static function ValidarCampos(Request $request, RequestHandler $handler)
@@ -81,7 +78,7 @@ class PedidoMW implements IApiCampos
 
         $codigo_pedido = $params["codigo_pedido"];
 
-        $pedido = Pedido::obtenerPedido($codigo_pedido);
+        $pedido = Pedido::find($codigo_pedido);
         $codigo_mesa = $pedido->codigo_mesa;
 
         $productos = Producto::all();

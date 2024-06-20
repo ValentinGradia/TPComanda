@@ -4,9 +4,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
 
+use \App\Models\Mesa as Mesa;
+use \App\Models\Pedido as Pedido;
+
 require_once './models/Mesa.php';
 require_once './models/Pedido.php';
 require_once './interfaces/IApiCampos.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 class MesaMW implements IApiCampos
 {
@@ -32,14 +36,18 @@ class MesaMW implements IApiCampos
         $response = new ResponseClass();
         $params = $request->getParsedBody();
 
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
+
         $codigo_mesa = $params["codigo_mesa"];
         $codigo_pedido = $params["codigo_pedido"];
         $estado_mesa = $params["estado_mesa"];
-        $rol = $params["rol"];
+        $rol = $datos->rol;
 
 
-        $mesa = Mesa::ObtenerMesa($codigo_mesa);
-        $pedido = Pedido::obtenerPedido($codigo_pedido);
+        $mesa = Mesa::find($codigo_mesa);
+        $pedido = Pedido::find($codigo_pedido);
 
         //validar que el codigo del pedido este asociado a la mesa
         if($pedido->codigo_mesa != $codigo_mesa)
@@ -88,6 +96,10 @@ class MesaMW implements IApiCampos
                     $response->getBody()->write(json_encode(array("error" => "verifique el estado mesa ingresado"))); 
                 }
             }
+            else
+            {
+                $response->getBody()->write(json_encode(array("error" => "no tiene permisos"))); 
+            }
         }
 
 
@@ -102,7 +114,7 @@ class MesaMW implements IApiCampos
         $params = $request->getParsedBody();
         $codigo_mesa = $params["codigo_mesa"];
 
-        $mesa = Mesa::ObtenerMesa($codigo_mesa);
+        $mesa = Mesa::find($codigo_mesa);
 
         if($mesa->estado_mesa == "con cliente esperando pedido" || $mesa->estado_mesa == "con cliente comiendo")
         {
@@ -121,7 +133,7 @@ class MesaMW implements IApiCampos
         $response = new ResponseClass();
         $params = $request->getParsedBody();
 
-        if(Mesa::ObtenerMesa($params["codigo_mesa"]))
+        if(Mesa::find($params["codigo_mesa"]))
         {
             $response->getBody()->write(json_encode(array("error" => "esa mesa ya existe")));
         }
@@ -140,7 +152,7 @@ class MesaMW implements IApiCampos
         $bodyParams = $request->getParsedBody();
         $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
-        if(Mesa::ObtenerMesa($params["codigo_mesa"]))
+        if(Mesa::find($params["codigo_mesa"]))
         {
             $response = $handler->handle($request);
         }
