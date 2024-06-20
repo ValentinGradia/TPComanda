@@ -6,6 +6,7 @@ use Slim\Psr7\Response as ResponseClass;
 
 
 require_once './models/Producto.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 class UsuarioMW
 {
@@ -24,11 +25,12 @@ class UsuarioMW
     public function VerificarRol(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
-        $queryParams = $request->getQueryParams();
-        $bodyParams = $request->getParsedBody();
-        $params = !empty($queryParams) ? $queryParams : $bodyParams;
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
 
-        if($params["rol"] !== $this->perfil)
+        $datos = AutentificadorJWT::ObtenerData($token);
+
+        if($datos->rol !== $this->perfil)
         {
             $response->getBody()->write(json_encode(array("Error" => "No sos ".$this->perfil)));
         }

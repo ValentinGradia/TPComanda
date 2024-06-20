@@ -6,6 +6,8 @@ require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Usuario as Usuario;
 use \App\Models\Registro as Registro;
+use Slim\Psr7\Response;
+
 
 class Logger
 {
@@ -42,14 +44,34 @@ class Logger
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public static function ValidarSesion($request, $response, $args)
+    public static function ValidarSesion($request, $handler)
     {
         $header = $request->getHeaderLine('Authorization');
-        $params = $request->getParsedBody();
+        $response = new Response();
 
-        $token = trim(explode("Bearer", $header)[1]);
+        if($header)
+        {
+            $token = trim(explode("Bearer", $header)[1]);
+        }
+        else{$token = '';}
+
+        try
+        {
+            $datos = AutentificadorJWT::ObtenerData($token);
+            if($datos->estado == "activo")
+            {
+                $response = $handler->handle($request);
+            }else
+            {
+                $response->getBody()->write(json_encode(array("error" => "no es un usuario activo"))); 
+            }
+        }catch(Exception $e)
+        {
+            $response->getBody()->write(json_encode(array("error" => "tiene que haber iniciado sesion"))); 
+        }
+
+        return $response;
         
-
     }
 
     public static function Salir($request, $response, $args){

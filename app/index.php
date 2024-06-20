@@ -72,7 +72,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get("/csv", \UsuarioController::class. ':DescargarCsv');
 
-    $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
+    $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(new UsuarioMW("admin"));
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
 
@@ -80,13 +80,11 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
 })->add(Logger::class . ':ValidarSesion');
 //Guardar token en variable
-//deshashear contraseña
 //traer tiempo restante
 //guardar foto cliente
 //probar descargas csv
 //descarga pdfs
-//crear login
-//pedido tengo el cobro
+//pedido tenga el cobro
 //AGREGAR ATRIBUTO NOMBRE EMPLEADO A CARGO
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
