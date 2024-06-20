@@ -78,7 +78,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->put('[/]', \UsuarioController::class . ':ModificarUno');
 
-});
+})->add(Logger::class . ':ValidarSesion');
 //Guardar token en variable
 //deshashear contraseña
 //traer tiempo restante

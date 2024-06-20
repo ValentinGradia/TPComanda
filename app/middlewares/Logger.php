@@ -1,10 +1,11 @@
 <?php
 
 require_once './models/Usuario.php';
-require_once './models/Registros.php';
+require_once './models/Registro.php';
 require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Usuario as Usuario;
+use \App\Models\Registro as Registro;
 
 class Logger
 {
@@ -18,18 +19,18 @@ class Logger
     {
         $params = $request->getParsedBody();
         $id = $params["id_usuario"];
-        $nombre = $params["nombre"];
         $clave = $params["clave"];
 
         $usuario = Usuario::find($id);
         if($usuario !== null && password_verify($clave, $usuario->clave))
         {
-            $token = AutentificadorJWT::CrearToken(array('Id_usuario' => $usuario->id_usuario, 'nombre' => $usuario->nombre, 'rol' => $usuario->rol ));
+            $token = AutentificadorJWT::CrearToken(array('Id_usuario' => $usuario->id_usuario, 'nombre' => $usuario->nombre, 'rol' => $usuario->rol,
+            'estado' => $usuario->estado));
             
             $registro = new Registro();
             $registro->id_usuario = $id;
-            $registro->fecha_logeo = date('Y-M-D');
-            $registro->CrearRegistroLogin();    
+            $registro->fecha_logueo = date('Y-m-d H:i:s');
+            $registro->save();  
             $payload = json_encode(array('jwt' => $token));
         }
         else
@@ -47,11 +48,12 @@ class Logger
         $params = $request->getParsedBody();
 
         $token = trim(explode("Bearer", $header)[1]);
+        
 
     }
 
     public static function Salir($request, $response, $args){
-        
+
         $payload = json_encode(array('mensaje'=>'Sesion Cerrada'));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
