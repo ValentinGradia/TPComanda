@@ -10,7 +10,6 @@ class Registro
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO registros (id_usuario, fecha_logeo) VALUES (:id_usuario, :fecha_logeo)");
-        $fecha = new DateTime(date('Y-m-d H:i:s'));
 
         $consulta->bindValue(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
         $consulta->bindValue(':fecha_logeo', $this->fecha_logeo);

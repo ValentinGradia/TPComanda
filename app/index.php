@@ -10,6 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Routing\RouteContext;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once "../app/controllers/MesaController.php";
@@ -35,19 +36,33 @@ $dotenv->safeLoad();
 // Add error middleware
 $app->addErrorMiddleware(true, true, true);
 
+// Eloquent
+$container=$app->getContainer();
+
+$capsule = new Capsule;
+$capsule->addConnection([
+    'driver'    => 'mysql',
+    'host'      => $_ENV['MYSQL_HOST'],
+    'database'  => $_ENV['MYSQL_DB'],
+    'username'  => $_ENV['MYSQL_USER'],
+    'password'  => $_ENV['MYSQL_PASS'],
+    'charset'   => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix'    => '',
+]);
+
 // Add parse body
 $app->addBodyParsingMiddleware();
 
+$capsule->setAsGlobal();
+
+$capsule->bootEloquent();
+
 // Routes
-
-// $app->get("[/]", function(Request $request, Response $response){
-//     $response->getBody()->write("funciona!");
-
-//     return $response;
-// });
 
 $app->group("/sesion", function(RouteCollectorProxy $group){
     $group->post('[/]', \Logger::class . ':Loguear');
+    $group->get('[/]', \Logger::class.'::Salir');
 });
 
 $app->group("/usuarios", function (RouteCollectorProxy $group){
@@ -60,6 +75,8 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
+
+    $group->put('[/]', \UsuarioController::class . ':ModificarUno');
 
 });
 //Guardar token en variable
