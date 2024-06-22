@@ -59,6 +59,8 @@ $capsule->setAsGlobal();
 
 $capsule->bootEloquent();
 
+use \App\Models\Pedido as Pedido;
+
 // Routes
 
 $app->group("/sesion", function(RouteCollectorProxy $group){
@@ -84,7 +86,6 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 //Guardar token en variable
 //traer tiempo restante
 //guardar foto cliente
-//hacer encuesta
 //descarga pdfs
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
@@ -115,7 +116,6 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
 
     $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
-    ->add(AutenticadorUsuario::class . ':verificarRolToken')
     ->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
@@ -133,7 +133,6 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarCampos');
 
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
-    ->add(AutenticadorUsuario::class . ':verificarRolToken')
     ->add(PedidoMW::class . ':ValidarCodigoNoExistente')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
@@ -145,4 +144,16 @@ $app->group("/encuesta", function (RouteCollectorProxy $group){
 
 });
 
+$app->group("/cargarFoto", function (RouteCollectorProxy $group){
+    $group->post('[/]', function (Request $request, Response $response){
+        $params = $request->getUploadedFiles();
+        $archivo = $params["file"]->getFilePath();
+
+        $parametros = $request->getParsedBody();
+        $pedido = Pedido::find($parametros["codigo_pedido"]);
+
+        
+        $ruta = "./Foto-mesas/usuarios.csv";
+    });
+})->add(Logger::class . ':ValidarSesion');
 $app->run();
