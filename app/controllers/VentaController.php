@@ -10,6 +10,7 @@ use \App\Models\Pedido as Pedido;
 use App\Models\Producto;
 use App\Models\Mesa as Mesa;
 
+
 class VentaController
 {
     public function CargarUno($request, $response, $args)
@@ -60,26 +61,14 @@ class VentaController
     {
         $ventas = Venta::all();
 
-        $contador = [];
-
-        foreach ($ventas as $venta) 
-        {
-            $codigo_mesa = $venta->codigo_mesa;
-
-            if (isset($contador[$codigo_mesa])) 
-            {
-                $contador[$codigo_mesa]++;
-            } 
-            else
-            {
-                $contador[$codigo_mesa] = 1;
-            }
-        }
+        $mesasUsos = $ventas->groupBy('codigo_mesa')->map(function($ventas){
+            return $ventas->count();
+        });
 
         $maxOcurrencias = 0;
         $codigoMesaMasRepetido = null;
 
-        foreach ($contador as $codigo => $ocurrencias) 
+        foreach ($mesasUsos as $codigo => $ocurrencias) 
         {
             if ($ocurrencias > $maxOcurrencias)
             {
@@ -105,26 +94,14 @@ class VentaController
     {
         $ventas = Venta::all();
 
-        $contador = [];
-
-        foreach ($ventas as $venta) 
-        {
-            $codigo_mesa = $venta->codigo_mesa;
-
-            if (isset($contador[$codigo_mesa])) 
-            {
-                $contador[$codigo_mesa]++;
-            } 
-            else
-            {
-                $contador[$codigo_mesa] = 1;
-            }
-        }
+        $mesasUsos = $ventas->groupBy('codigo_mesa')->map(function($ventas){
+            return $ventas->count();
+        });
 
         $minOcurrencias = PHP_INT_MAX;
         $codigoMesaMenosRepetido = null;
 
-        foreach ($contador as $codigo => $ocurrencias) 
+        foreach ($mesasUsos as $codigo => $ocurrencias) 
         {
             if ($ocurrencias < $minOcurrencias)
             {
@@ -143,5 +120,36 @@ class VentaController
         $payload = json_encode(array("Las mesas que menos se usaron fueron" => $arrayMesasMin));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public static function TraerMesaMasFacturo($request, $response, $args)
+    {
+        $ventas = Venta::all();
+
+        $mesasFacturas = $ventas->groupBy('codigo_mesa')->map(function ($ventas) {
+            return $ventas->sum('cobro');
+        });
+
+        $maxCobro = 0;
+        $codigoMesaMasFacturo = null;
+
+        foreach ($mesasFacturas as $codigo => $cobros) 
+        {
+            if ($cobros > $maxCobro)
+            {
+                $maxCobro = $cobros;
+                $codigoMesaMasFacturo = $codigo;
+            }
+            else if($cobros == $maxCobro)
+            {
+                $codigoMesaMasFacturo = $codigoMesaMasFacturo . ",$codigo";
+            }
+        }
+
+        $payload = json_encode(array("Las mesas que mas facturaron fueron" => $codigoMesaMasFacturo));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+
+
     }
 }

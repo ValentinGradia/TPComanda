@@ -146,7 +146,7 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/menosUsada', \VentaController::class . ':TraerMesaMenosUsada');
 
-    //$group->get('/masFacturo')
+    $group->get('/masFacturo', \VentaController::class . ':TraerMesaMasFacturo');
 
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
