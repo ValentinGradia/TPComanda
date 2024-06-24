@@ -142,7 +142,11 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
-    $group->get('/traerMasUsada', \VentaController::class . ':TraerMesaMasUsada');
+    $group->get('/masUsada', \VentaController::class . ':TraerMesaMasUsada');
+
+    $group->get('/menosUsada', \VentaController::class . ':TraerMesaMenosUsada');
+
+    //$group->get('/masFacturo')
 
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
@@ -154,7 +158,7 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
 
-})->add(Logger::class . ':ValidarSesion');
+});//->add(Logger::class . ':ValidarSesion');
 
 $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
 ->add(Logger::class . ':ValidarSesion');

@@ -86,12 +86,62 @@ class VentaController
                 $maxOcurrencias = $ocurrencias;
                 $codigoMesaMasRepetido = $codigo;
             }
+            else if($ocurrencias == $maxOcurrencias)
+            {
+                $codigoMesaMasRepetido = $codigoMesaMasRepetido . ",$codigo";
+            }
         }
 
-        $payload = json_encode(array("La mesa que mas se uso fue" => $codigoMesaMasRepetido));
+        $arrayMesasMin = explode(',',$codigoMesaMasRepetido);
+
+        $payload = json_encode(array("Las mesas que mas se usaron fueron" => $codigoMesaMasRepetido));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
 
         
+    }
+
+    public static function TraerMesaMenosUsada($request, $response, $args)
+    {
+        $ventas = Venta::all();
+
+        $contador = [];
+
+        foreach ($ventas as $venta) 
+        {
+            $codigo_mesa = $venta->codigo_mesa;
+
+            if (isset($contador[$codigo_mesa])) 
+            {
+                $contador[$codigo_mesa]++;
+            } 
+            else
+            {
+                $contador[$codigo_mesa] = 1;
+            }
+        }
+
+        $minOcurrencias = PHP_INT_MAX;
+        $codigoMesaMenosRepetido = null;
+
+        foreach ($contador as $codigo => $ocurrencias) 
+        {
+            if ($ocurrencias < $minOcurrencias)
+            {
+                $minOcurrencias = $ocurrencias;
+                $codigoMesaMenosRepetido = $codigo;
+            }
+            else if($ocurrencias == $minOcurrencias)
+            {
+                $codigoMesaMenosRepetido = $codigoMesaMenosRepetido . ",$codigo";
+            }
+        }
+
+        $arrayMesasMin = explode(',',$codigoMesaMenosRepetido);
+
+
+        $payload = json_encode(array("Las mesas que menos se usaron fueron" => $arrayMesasMin));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }
