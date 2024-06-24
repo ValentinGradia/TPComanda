@@ -134,6 +134,8 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
+    $group->get('/traerMasUsada', \VentaController::class . ':TraerMesaMasUsada');
+
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')

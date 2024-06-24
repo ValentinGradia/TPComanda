@@ -55,4 +55,43 @@ class VentaController
 
         
     }
+
+    public static function TraerMesaMasUsada($request, $response, $args)
+    {
+        $ventas = Venta::all();
+
+        $contador = [];
+
+        foreach ($ventas as $venta) 
+        {
+            $codigo_mesa = $venta->codigo_mesa;
+
+            if (isset($contador[$codigo_mesa])) 
+            {
+                $contador[$codigo_mesa]++;
+            } 
+            else
+            {
+                $contador[$codigo_mesa] = 1;
+            }
+        }
+
+        $maxOcurrencias = 0;
+        $codigoMesaMasRepetido = null;
+
+        foreach ($contador as $codigo => $ocurrencias) 
+        {
+            if ($ocurrencias > $maxOcurrencias)
+            {
+                $maxOcurrencias = $ocurrencias;
+                $codigoMesaMasRepetido = $codigo;
+            }
+        }
+
+        $payload = json_encode(array("La mesa que mas se uso fue" => $codigoMesaMasRepetido));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+
+        
+    }
 }
