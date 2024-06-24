@@ -19,6 +19,6 @@ class Producto extends Model //todos los modelos tienen que heredar del Model de
 
     //
     protected $fillable = [
-        'id_producto', 'tipo', 'nombre', 'precio', 'cantidad', 'estado_producto','codigo_mesa','id_empleado'
+        'tipo', 'nombre', 'precio', 'cantidad', 'estado_producto','codigo_mesa','tiempo_preparacion','id_cliente','id_empleado'
     ];
 }

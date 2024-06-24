@@ -18,6 +18,7 @@ require_once "../app/controllers/UsuarioController.php";
 require_once "../app/controllers/PedidoController.php";
 require_once "../app/controllers/ProductoController.php";
 require_once "../app/controllers/EncuestaController.php";
+require_once "../app/controllers/VentaController.php";
 require_once "../app/db/AccesoDatos.php";
 require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
@@ -25,10 +26,10 @@ require_once "../app/middlewares/ProductoMW.php";
 require_once "../app/middlewares/PedidoMW.php";
 require_once "../app/middlewares/Logger.php";
 require_once "../app/middlewares/AutenticadorUsuario.php";
-//require_once "../app/middlewares/AutentificadorJWT.php";
+require_once "../app/middlewares/AutentificadorJWT.php";
 
 // Instantiate App
-$app = AppFactory::create();
+$app = AppFactory::create(); 
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -60,6 +61,8 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
 use \App\Models\Pedido as Pedido;
+use App\Models\Producto as Producto;
+use App\Models\Usuario as Usuario;
 
 // Routes
 
@@ -87,6 +90,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 //traer tiempo restante
 //guardar foto cliente
 //descarga pdfs
+
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
 
@@ -103,11 +107,14 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
 })->add(Logger::class . ':ValidarSesion');
 
-
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
 
     $group->get('/traer', \PedidoController::class . ":TraerUno")->add(PedidoMW::class . ':ValidarCodigoNoExistente');
+
+    $group->get('/tiempoDemora', \PedidoController::class . ':TraerTiempoRestante')->add(new UsuarioMW("cliente"))
+    ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente')
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 
@@ -123,21 +130,24 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 })->add(Logger::class . ':ValidarSesion');
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
-    $group->get('[/]', \MesaController::class . ':TraerTodos');
+    $group->get('[/]', \MesaController::class . ':TraerTodos')->add(new UsuarioMW("socio"));
 
     $group->get('/traer', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
-    ->add(MesaMW::class . ':ValidarCampos');
+    ->add(MesaMW::class . ':ValidarCampos')->add(new UsuarioMW("admin"));
 
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
-    ->add(PedidoMW::class . ':ValidarCodigoNoExistente')->add(MesaMW::class . ':ValidarCodigoNoExistente');
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
 
 })->add(Logger::class . ':ValidarSesion');
+
+$app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
+->add(Logger::class . ':ValidarSesion');
 
 $app->group("/encuesta", function (RouteCollectorProxy $group){
     $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'))->add(MesaMW::class . ':ValidarCodigoNoExistente');
@@ -150,10 +160,28 @@ $app->group("/cargarFoto", function (RouteCollectorProxy $group){
         $archivo = $params["file"]->getFilePath();
 
         $parametros = $request->getParsedBody();
+        $codigo_pedido = $parametros["codigo_pedido"];
         $pedido = Pedido::find($parametros["codigo_pedido"]);
+        $codigo_mesa = $pedido->codigo_mesa;
+
+        $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
+
+        $usuario = Usuario::find($producto->id_cliente);
+
+        $nombre_archivo = "$codigo_pedido"."-$codigo_mesa"."-$usuario->nombre";
+        $ruta = "./Foto-mesas/";
+
+        move_uploaded_file($archivo, $ruta . $nombre_archivo . ".png");
 
         
-        $ruta = "./Foto-mesas/usuarios.csv";
-    });
+        $payload = json_encode(array("mensaje" => "Foto creada con exito"));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+
+
+        
+    })->add(new UsuarioMW('mozo'))
+    ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 })->add(Logger::class . ':ValidarSesion');
+
 $app->run();

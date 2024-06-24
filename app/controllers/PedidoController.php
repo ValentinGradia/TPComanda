@@ -3,8 +3,10 @@ require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 
 use \App\Models\Pedido as Pedido;
+use \App\Models\Producto as Producto;
+use \App\Models\Usuario as Usuario;
 
-class PedidoController extends Pedido implements IApiUsable
+class PedidoController  implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
@@ -15,7 +17,13 @@ class PedidoController extends Pedido implements IApiUsable
         $estado_pedido = $parametros["estado_pedido"];
         $tiempo_inicio = date('Y-m-d H:i');
         $tiempo_estimado_entregado = $parametros["tiempo_estimado_entregado"];
-        $nombre_cliente = $parametros["nombre_cliente"];
+
+        $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
+
+        $usuario = Usuario::find($producto->id_cliente);
+
+        $nombre_cliente = $usuario->nombre;
+
 
         $pedido = new Pedido();
         $pedido->codigo_mesa = $codigo_mesa;
@@ -93,12 +101,25 @@ class PedidoController extends Pedido implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    public function TraerTiempoRestante($request, $response, $args)
+    public static function TraerTiempoRestante($request, $response, $args)
     {
         $params = $request->getQueryParams();
         $codigo_pedido = $params['codigo_pedido'];
-        $pedido = Pedido::obtenerPedido($codigo_pedido);
-        $payload = json_encode($pedido);
+        $codigo_mesa = $params['codigo_mesa'];
+        $pedido = Pedido::where('codigo_pedido',$codigo_pedido)->where('codigo_mesa',$codigo_mesa)->first();
+
+        $fechaHoraInicio = $pedido->tiempo_inicio;
+        $fechaHoraInicioObj = new DateTime($fechaHoraInicio);
+        $minutosInicio = $fechaHoraInicioObj->format('i');
+
+        
+        $fechaHoraEstimado = $pedido->tiempo_estimado_entregado;
+        $fechaHoraEstimadoObj = new DateTime($fechaHoraEstimado);
+        $minutosEstimado = $fechaHoraEstimadoObj->format('i');
+
+        $demora = (int)$minutosEstimado - (int)$minutosInicio;
+        
+        $payload = json_encode(array("Tiempo demora es de" => $demora . ' minutos'));
 
         $response->getBody()->write($payload);
         return $response

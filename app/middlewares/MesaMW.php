@@ -30,7 +30,6 @@ class MesaMW implements IApiCampos
         return $response;
     }
 
-
     public static function CambiarEstadoMesa(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
@@ -60,29 +59,37 @@ class MesaMW implements IApiCampos
 
             if($rol == "mozo")
             {
-                //si la mesa previamente esta cerrado y el estado de la mesa que pasa por postman es cliente esperando pedido accede
-                if($mesa->estado_mesa == "cerrada" && $estado_mesa == "con cliente esperando pedido" )
+                //validar que el pedido este listo 
+                if($pedido->estado_pedido == "listo para servir")
                 {
-                    $response = $handler->handle($request);
+                    //para que el estado de la mesa sea con cliente comiendo la mesa previamente tiene que estar con cliente esperando pedido
+                    if($mesa->estado_mesa == "con cliente esperando pedido" && $estado_mesa == "con cliente comiendo" )
+                    {
+                        //se entrega el pedido
+                        $pedido->tiempo_entregado = date('Y-m-d H:i');
+                        $pedido->estado_pedido = "servido";
+                        $pedido->save();
+                        $response = $handler->handle($request);
+                    }
+                    else
+                    {
+                        $response->getBody()->write(json_encode(array("error" => "verifique el estado mesa ingresado"))); 
+                    }
                 }
-                //para que el estado de la mesa sea con cliente comiendo la mesa previamente tiene que estar con cliente esperando pedido
-                else if($mesa->estado_mesa == "con cliente esperando pedido" && $estado_mesa == "con cliente comiendo" )
+                else if ($pedido->estado_pedido == "servido")
                 {
-                    //se entrega el pedido
-                    $pedido->tiempo_entrega = $params["tiempo_entrega"];
-                    $response = $handler->handle($request);
-                }
-                else if($mesa->estado_mesa == "con cliente comiendo" && $estado_mesa == "con cliente pagando")
-                {
-                    $response = $handler->handle($request);
-                } 
-                else if( $estado_mesa == "cerrada")
-                {
-                    $response->getBody()->write(json_encode(array("error" => "no tiene los permisos para cerrar la mesa"))); 
+                    if($mesa->estado_mesa == "con cliente comiendo" && $estado_mesa == "con cliente pagando")
+                    {
+                        $response = $handler->handle($request);
+                    } 
+                    else if($estado_mesa == "cerrada")
+                    {
+                        $response->getBody()->write(json_encode(array("error" => "no tiene los permisos para cerrar la mesa"))); 
+                    }
                 }
                 else
                 {
-                    $response->getBody()->write(json_encode(array("error" => "verifique el estado mesa ingresado"))); 
+                    $response->getBody()->write(json_encode(array("error" => "el pedido aun no esta listo")));
                 }
             }
             else if($rol == "socio")

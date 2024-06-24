@@ -4,8 +4,9 @@ require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Producto as Producto;
+use \App\Models\Mesa as Mesa;
 
-class ProductoController extends Producto implements IApiUsable
+class ProductoController implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
@@ -25,6 +26,19 @@ class ProductoController extends Producto implements IApiUsable
         $producto->cantidad = $cantidad;
         $producto->estado_producto = $estado_producto;
         $producto->codigo_mesa = $codigo_mesa;
+
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
+        $producto->id_cliente = $datos->Id_usuario;
+
+        $mesa = Mesa::find($codigo_mesa);
+
+        if($mesa->estado_mesa == "cerrada")
+        {
+          $mesa->estado_mesa = "con cliente esperando pedido";
+          $mesa->save();
+        }
 
         $producto->save();
 
@@ -94,6 +108,12 @@ class ProductoController extends Producto implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
+    public static function TraerPorCodigoMesa($codigo_mesa)
+    {
+      $productos = Producto::where('codigo_mesa',$codigo_mesa)->get();
+      return $productos;
+    }
+
     public function TraerTodos($request, $response, $args)
     {
         $lista = Producto::all();
@@ -123,7 +143,8 @@ class ProductoController extends Producto implements IApiUsable
           $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
           $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
           $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
-          $producto->id_empleado = $datos->id_usuario;
+          $producto->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $producto->tiempo_preparacion;  
+          $producto->id_empleado = $datos->Id_usuario;
   
           $producto->save();
   

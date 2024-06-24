@@ -6,7 +6,7 @@ require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Encuesta as Encuesta;
 
-class EncuestaController extends Encuesta implements IApiUsable
+class EncuestaController implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {

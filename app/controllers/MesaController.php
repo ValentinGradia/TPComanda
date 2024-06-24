@@ -4,7 +4,7 @@ require_once './interfaces/IApiUsable.php';
 
 use \App\Models\Mesa as Mesa;
 
-class MesaController extends Mesa implements IApiUsable
+class MesaController implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
@@ -92,7 +92,7 @@ class MesaController extends Mesa implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
-        $mesa = Mesa::ObtenerMesa($parametros["codigo_mesa"]);
+        $mesa = Mesa::find($parametros["codigo_mesa"]);
 
         $mesa->estado_mesa = !empty($parametros["estado_mesa"]) ? $parametros["estado_mesa"] : $mesa->estado_mesa;
         $mesa->save();

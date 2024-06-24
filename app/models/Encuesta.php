@@ -17,6 +17,6 @@ class Encuesta extends Model
     const DELETED_AT = 'fecha_baja';
 
     protected $fillable = [
-        'id_encuesta','codigo_mesa','puntaje_mesa', 'puntaje_restaurante', 'puntaje_mozo','puntaje_cocinero','comentario','nombre_cliente','fecha_baja'
+        'codigo_mesa','puntaje_mesa', 'puntaje_restaurante', 'puntaje_mozo','puntaje_cocinero','comentario','nombre_cliente','fecha_baja'
     ];
 }

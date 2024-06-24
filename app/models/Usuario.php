@@ -19,7 +19,7 @@ class Usuario extends Model //todos los modelos tienen que heredar del Model de 
 
     //
     protected $fillable = [
-        'id_usuario', 'nombre', 'clave', 'rol', 'estado', 'fecha_baja'
+        'nombre', 'clave', 'rol', 'estado', 'fecha_baja'
     ];
 }
 

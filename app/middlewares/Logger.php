@@ -67,17 +67,10 @@ class Logger
             }
         }catch(Exception $e)
         {
-            $response->getBody()->write(json_encode(array("error" => "tiene que haber iniciado sesion"))); 
+            $response->getBody()->write(json_encode(array("error" => $e->getMessage()))); 
         }
 
         return $response;
         
-    }
-
-    public static function Salir($request, $response, $args){
-
-        $payload = json_encode(array('mensaje'=>'Sesion Cerrada'));
-        $response->getBody()->write($payload);
-        return $response->withHeader('Content-Type', 'application/json');
     }
 }

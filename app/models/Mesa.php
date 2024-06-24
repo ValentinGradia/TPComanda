@@ -19,6 +19,6 @@ class Mesa extends Model //todos los modelos tienen que heredar del Model de elo
 
     //
     protected $fillable = [
-        'codigo_mesa', 'estado_mesa','fecha_baja'
+        'estado_mesa','fecha_baja'
     ];
 }

@@ -40,7 +40,7 @@ class ProductoMW implements IApiCampos
         $bodyParams = $request->getParsedBody();
         $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
-        if(Mesa::find($params["id_producto"]))
+        if(Producto::find($params["id_producto"]))
         {
             $response = $handler->handle($request);
         }
@@ -58,10 +58,10 @@ class ProductoMW implements IApiCampos
         $params = $request->getParsedBody();
         $codigo_mesa = $params["codigo_mesa"];
         
-        $productos = Producto::where('cdigo_mesa',$codigo_mesa)->first();
+        $productos = Producto::where('codigo_mesa',$codigo_mesa)->get();
 
-        $productosPendientes = array_filter($productos, function($producto){
-            return $producto->estado_producto == "pendiente";
+        $productosPendientes = array_filter($productos->toArray(), function($producto){
+            return $producto["estado_producto"] == "pendiente";
         });
 
         //validar que los productos hayan sido pedidos para poder crear dicho pedido

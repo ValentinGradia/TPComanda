@@ -57,8 +57,8 @@ class UsuarioMW
         $producto = Producto::find($params["id_producto"]);
         $tipo_producto = $producto->tipo;
 
-        //validar que el producto ingresado este pendiente
-        if($producto->estado_producto == "pendiente")
+        //validar que el producto ingresado este pendiente o en preparacion
+        if($producto->estado_producto == "pendiente" || $producto->estado_producto == "en preparacion")
         {
             //Dependiendo el tipo de producto ira a determinado empleado
             switch($tipo_producto)

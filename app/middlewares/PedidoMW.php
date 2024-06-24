@@ -21,8 +21,7 @@ class PedidoMW implements IApiCampos
 
         $params = $request->getParsedBody();
 
-        if(isset($params["codigo_mesa"], $params["codigo_pedido"], $params["estado_pedido"], $params["nombre_cliente"],
-        $params["tiempo_preparacion"] ))
+        if(isset($params["codigo_mesa"], $params["codigo_pedido"], $params["estado_pedido"]))
         {
             $response = $handler->handle($request);
         }
@@ -34,12 +33,57 @@ class PedidoMW implements IApiCampos
         return $response;
     }
 
+    public static function ValidarPedidoEnPreparacion(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getParsedBody();
+
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $pedido = Pedido::find($codigo_pedido);
+
+        if($pedido->estado_pedido == "en preparacion")
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "el pedido no esta en preparacion"))); 
+        }
+
+        return $response;
+    }
+
+    public static function ValidarPedidoListo(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getParsedBody();
+
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $pedido = Pedido::find($codigo_pedido);
+
+        if($pedido->estado_pedido == "servido")
+        {
+            $response = $handler->handle($request);
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(array("error" => "el pedido no esta en preparacion"))); 
+        }
+
+        return $response;
+    }
+
     public static function ValidarCodigoExistente(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
         $params = $request->getParsedBody();
+        $codigo_pedido = $params["codigo_pedido"];
 
-        if(Pedido::where('codigo_pedido',$params["codigo_pedido"]))
+        if(Pedido::find($codigo_pedido))
         {
             $response->getBody()->write(json_encode(array("error" => "esa codigo ya existe")));
         }
@@ -59,7 +103,7 @@ class PedidoMW implements IApiCampos
         $bodyParams = $request->getParsedBody();
         $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
-        if(Pedido::where('codigo_pedido',$params["codigo_pedido"]))
+        if(Pedido::find($params["codigo_pedido"]))
         {
             $response = $handler->handle($request);
         }
@@ -100,7 +144,7 @@ class PedidoMW implements IApiCampos
         if($flag)
         {
             $pedido->estado_pedido = "listo para servir";
-            $pedido->tiempo_entregado = date('Y-m-d H:i');
+            $pedido->save();
             $response = $handler->handle($request);
         }
         else
