@@ -4,6 +4,7 @@ require_once './interfaces/IApiUsable.php';
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
+use Carbon\Carbon;
 use \App\Models\Usuario as Usuario;
 
 class PedidoController  implements IApiUsable
@@ -99,6 +100,30 @@ class PedidoController  implements IApiUsable
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
+    }
+
+    public static function Estadisticas30Dias($request, $response, $args)
+    {
+      $fechaActual = Carbon::now()->format('Y-m-d H:i');
+      
+      $fechaHace30Dias = Carbon::now()->subDays(30)->format('Y-m-d H:i');
+  
+      $pedidos= Pedido::whereBetween('tiempo_entregado', [$fechaHace30Dias, $fechaActual])->get();
+
+      $acumulador = 0;
+      foreach ($pedidos as $pedido)
+      {
+          $tiempo_entregado = new DateTime($pedido->tiempo_entregado);
+          if($tiempo_entregado >= $fechaHace30Dias)
+          {
+              $acumulador += $pedido->cobro;
+          }
+      }
+      $promedio = $acumulador / 30;
+  
+      $payload = json_encode(array("El cobro promedio de los ultimos 30 dias fue: " => $promedio));
+      $response->getBody()->write($payload);
+      return $response->withHeader('Content-Type', 'application/json');
     }
 
     public static function TraerPedidosNoEntregadosATiempo($request, $response, $args)

@@ -86,9 +86,6 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
 })->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
 
-//Guardar token en variable
-//traer tiempo restante
-//guardar foto cliente
 //descarga pdfs
 
 $app->group("/productos", function (RouteCollectorProxy $group){
@@ -117,6 +114,8 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
     $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
+
+    $group->get('/estadistica30Dias', \PedidoController::class . ':Estadisticas30Dias');
 
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 
