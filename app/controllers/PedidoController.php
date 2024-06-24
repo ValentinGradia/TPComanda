@@ -1,6 +1,7 @@
 <?php
 require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
@@ -12,12 +13,16 @@ class PedidoController  implements IApiUsable
     public function CargarUno($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
 
         $codigo_mesa = $parametros['codigo_mesa'];
         $codigo_pedido = $parametros['codigo_pedido'];
         $estado_pedido = $parametros["estado_pedido"];
         $tiempo_inicio = date('Y-m-d H:i');
         $tiempo_estimado_entregado = $parametros["tiempo_estimado_entregado"];
+        
 
         $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
 
@@ -33,6 +38,7 @@ class PedidoController  implements IApiUsable
         $pedido->tiempo_inicio = $tiempo_inicio;
         $pedido->tiempo_estimado_entregado = $tiempo_estimado_entregado;
         $pedido->nombre_cliente = $nombre_cliente;
+        $pedido->id_mozo = $datos->Id_usuario;
 
 
         $pedido->save();

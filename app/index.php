@@ -78,6 +78,8 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get("/csv", \UsuarioController::class. ':DescargarCsv');
 
+    $group->get('/operaciones',\UsuarioController::class . ':TraerOperaciones');
+
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
@@ -87,6 +89,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 })->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
 
 //descarga pdfs
+//VALIDAR DELETE 
 
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
@@ -115,7 +118,7 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
 
-    $group->get('/estadistica30Dias', \PedidoController::class . ':Estadisticas30Dias');
+    $group->get('/estadistica30Dias', \PedidoController::class . ':Estadisticas30Dias')->add(new UsuarioMW("socio"));
 
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 

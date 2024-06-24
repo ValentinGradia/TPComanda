@@ -3,6 +3,8 @@ require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
 
 use \App\Models\Usuario as Usuario;
+use \App\Models\Producto as Producto;
+use \App\Models\Pedido as Pedido;
 
 class UsuarioController implements IApiUsable
 {
@@ -82,6 +84,32 @@ class UsuarioController implements IApiUsable
 
     $usuario = Usuario::find($id_usuario); //el find se usa exclusivamente para buscar por claves primarias (id)
     $payload = json_encode($usuario);
+
+    $response->getBody()->write($payload);
+    return $response
+      ->withHeader('Content-Type', 'application/json');
+  }
+
+
+  public static function TraerOperaciones($request, $response, $args)
+  {
+    $params = $request->getQueryParams();
+    $id_usuario = $params["id_usuario"];
+    $usuario = Usuario::find($id_usuario);
+
+    $operaciones = 0;
+    if($usuario->rol !== "mozo")
+    {
+      $productos = Producto::where('id_empleado',$id_usuario)->get();
+      $operaciones = count($productos);
+    }
+    else
+    {
+      $pedidos = Pedido::where('id_mozo',$id_usuario)->get();
+      $operaciones = count($pedidos);
+    }
+
+    $payload = json_encode(array("La cantidad de operaciones que hizo el usuario ingresado fue: " => $operaciones));
 
     $response->getBody()->write($payload);
     return $response
