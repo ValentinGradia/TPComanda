@@ -116,6 +116,8 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
+    $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
+
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 
     $group->post("[/]", \PedidoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarEstadoProducto')

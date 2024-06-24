@@ -101,6 +101,37 @@ class PedidoController  implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
+    public static function TraerPedidosNoEntregadosATiempo($request, $response, $args)
+    {
+      $pedidos = Pedido::all();
+
+      $pedidosNoEntregadosATiempo = array();
+
+      foreach($pedidos as $pedido)
+      {
+        $tiempo_estimado_entregado = $pedido->tiempo_estimado_entregado;
+        
+        $tiempo_entregado = $pedido->tiempo_entregado;
+
+        //validamos que el pedido haya sido entregado
+        if($tiempo_entregado !== null)
+        {
+          if($tiempo_entregado > $tiempo_estimado_entregado)
+          {
+            array_push($pedidosNoEntregadosATiempo, $pedido);
+          }
+
+        }
+
+      }
+
+      $payload = json_encode(array("lista de pedidos que no fueron entregados en tiempo estipulado" => $pedidosNoEntregadosATiempo));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
+    }
+
     public static function TraerTiempoRestante($request, $response, $args)
     {
         $params = $request->getQueryParams();
