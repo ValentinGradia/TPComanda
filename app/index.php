@@ -152,9 +152,12 @@ $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(new Usu
 ->add(Logger::class . ':ValidarSesion');
 
 $app->group("/encuesta", function (RouteCollectorProxy $group){
+
+    $group->get('/mejoresReseñas', \EncuestaController::class . ':TraerMejoresReseñas')->add(new UsuarioMW('socio'));
+
     $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'))->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
-});
+})->add(Logger::class . ':ValidarSesion');
 
 $app->group("/cargarFoto", function (RouteCollectorProxy $group){
     $group->post('[/]', function (Request $request, Response $response){

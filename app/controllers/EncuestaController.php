@@ -6,7 +6,7 @@ require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Encuesta as Encuesta;
 
-class EncuestaController implements IApiUsable
+class EncuestaController
 {
     public function CargarUno($request, $response, $args)
     {
@@ -54,51 +54,32 @@ class EncuestaController implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    public function TraerTodos($request, $response, $args)
+    public static function TraerMejoresReseñas($request, $response, $args)
     {
-        $lista = Encuesta::all();
-        $payload = json_encode(array("listaPedidos" => $lista));
+      $encuestas = Encuesta::all();
 
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
-    }
-    
-    public function ModificarUno($request, $response, $args)
-    {
-        $parametros = $request->getParsedBody();
-        $encuesta = encuesta::find($parametros["id_registro"]);
+      $mejoresEncuestas = array();
 
-        $encuesta->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $encuesta->codigo_mesa;
-        $encuesta->puntaje_mesa  = !empty($parametros["puntaje_mesa"]) ? $parametros["puntaje_mesa"] : $encuesta->puntaje_mesa;
-        $encuesta->puntaje_restaurante = !empty($parametros["puntaje_restaurante"]) ? $parametros["puntaje_restaurante"] : $encuesta->puntaje_restaurante;
-        $encuesta->puntaje_mozo = !empty($parametros["puntaje_mozo"]) ? $parametros["puntaje_mozo"] : $encuesta->puntaje_mozo;
-        $encuesta->puntaje_cocinero = !empty($parametros["puntaje_cocinero"]) ? $parametros["puntaje_cocinero"] : $encuesta->puntaje_cocinero;
-        $encuesta->comentario = !empty($parametros["comentario"]) ? $parametros["comentario"] : $encuesta->comentario;
-        $encuesta->nombre_cliente = !empty($parametros["nombre_cliente"]) ? $parametros["nombre_cliente"] : $encuesta->nombre_cliente;
-        $encuesta->fecha_alta = !empty($parametros["fecha_alta"]) ? $parametros["fecha_alta"] : $encuesta->fecha_alta;
-        $encuesta->fecha_baja = !empty($parametros["fecha_baja"]) ? $parametros["fecha_baja"] : $encuesta->fecha_baja;
-        $encuesta->save();
+      foreach($encuestas as $encuesta)
+      {
+        $puntaje_restaurante = $encuesta->puntaje_restaurante;
+        $puntaje_cocinero = $encuesta->puntaje_cocinero;
+        $puntaje_mesa = $encuesta->puntaje_mesa;
+        $puntaje_mozo = $encuesta->puntaje_mozo;
 
-        $payload = json_encode(array("mensaje" => "Encuesta modificada con exito"));
+        $promedio = ($puntaje_cocinero + $puntaje_mesa + $puntaje_mozo + $puntaje_restaurante) / 4;
 
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+        if($promedio > 6)
+        {
+          array_push($mejoresEncuestas, $encuesta);
+        }
+      }
+
+      $payload = json_encode(array('mejores encuestas' => $mejoresEncuestas));
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
     }
 
-    public function BorrarUno($request, $response, $args)
-    {
-        $parametros = $request->getParsedBody();
-        $pedido = Encuesta::find($parametros["id_registro"]);
-
-        $pedido->fecha_baja = date('Y-m-d H:i:s');
-        $pedido->delete();
-        
-        $payload = json_encode(array("mensaje" => "Encuesta borrada con exito"));
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
-    }
 }
