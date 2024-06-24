@@ -116,6 +116,41 @@ class UsuarioController implements IApiUsable
       ->withHeader('Content-Type', 'application/json');
   }
 
+  public static function TraerOperacionesPorSector($request, $response, $args)
+  {
+    $params = $request->getQueryParams();
+    $sector = $params["sector"];
+
+    $operaciones = array();
+
+    switch($sector)
+    {
+      case "cocina":
+        $productos = Producto::where('tipo','comida')->get();
+
+        foreach($productos as $producto)
+        {
+          $id_empleado = $producto->id_empleado;
+          if(isset($operaciones[$id_empleado]))
+          {
+            $operaciones[$id_empleado]++;
+          }
+          else
+          {
+            $operaciones[$id_empleado] = 1;
+          }
+        }
+    }
+
+    $payload = json_encode(array("Operaciones por sector (id_empleado : cantidad operaciones) " => $operaciones));
+
+    $response->getBody()->write($payload);
+    return $response
+      ->withHeader('Content-Type', 'application/json');
+
+
+  }
+
   public function TraerTodos($request, $response, $args)
   {
     $lista = Usuario::all(); //el all te trae todos los usuarios

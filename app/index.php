@@ -80,6 +80,8 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get('/operaciones',\UsuarioController::class . ':TraerOperaciones');
 
+    $group->get('/operacionesPorSector',\UsuarioController::class . ':TraerOperacionesPorSector');
+
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
