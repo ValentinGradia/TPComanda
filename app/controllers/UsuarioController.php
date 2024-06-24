@@ -140,6 +140,39 @@ class UsuarioController implements IApiUsable
             $operaciones[$id_empleado] = 1;
           }
         }
+        break;
+      case "barra":
+          $productos = Producto::where('tipo','trago')->get();
+  
+          foreach($productos as $producto)
+          {
+            $id_empleado = $producto->id_empleado;
+            if(isset($operaciones[$id_empleado]))
+            {
+              $operaciones[$id_empleado]++;
+            }
+            else
+            {
+              $operaciones[$id_empleado] = 1;
+            }
+          }
+          break;
+      case "patio trasero":
+            $productos = Producto::where('tipo','cerveza')->get();
+    
+            foreach($productos as $producto)
+            {
+              $id_empleado = $producto->id_empleado;
+              if(isset($operaciones[$id_empleado]))
+              {
+                $operaciones[$id_empleado]++;
+              }
+              else
+              {
+                $operaciones[$id_empleado] = 1;
+              }
+            }
+            break;
     }
 
     $payload = json_encode(array("Operaciones por sector (id_empleado : cantidad operaciones) " => $operaciones));

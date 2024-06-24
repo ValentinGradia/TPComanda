@@ -80,7 +80,7 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get('/operaciones',\UsuarioController::class . ':TraerOperaciones');
 
-    $group->get('/operacionesPorSector',\UsuarioController::class . ':TraerOperacionesPorSector');
+    $group->get('/operacionesPorSector',\UsuarioController::class . ':TraerOperacionesPorSector')->add(UsuarioMW::class . ':VerificarSector');
 
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
@@ -117,6 +117,8 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('/tiempoDemora', \PedidoController::class . ':TraerTiempoRestante')->add(new UsuarioMW("cliente"))
     ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente');
+
+    $group->get('/cancelados', PedidoController::class . ':TraerCancelados')->add(new UsuarioMW('admin'));
 
     $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
 

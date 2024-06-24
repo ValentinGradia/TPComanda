@@ -108,6 +108,17 @@ class PedidoController  implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
+    public static function TraerCancelados($request, $response, $args)
+    {
+      $parametros = $request->getQueryParams();
+      $pedidos = Pedido::whereNotNull('fecha_baja')->get();
+
+      $payload = json_encode(array("Pedidos cancelados: " => $pedidos));
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+    }
     public static function Estadisticas30Dias($request, $response, $args)
     {
       $fechaActual = Carbon::now()->format('Y-m-d H:i');

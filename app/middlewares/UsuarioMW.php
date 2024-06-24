@@ -24,6 +24,21 @@ class UsuarioMW
         return $this->VerificarRol($request, $handler);
     }
 
+    public static function VerificarSector(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getQueryParams();
+        $sector = $params["sector"];
+        if($sector !== "cocina" && $sector !== "barra" && $sector !== "patio trasero")
+        {
+            $response->getBody()->write(json_encode(array("Error" => "sector invalido")));
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+    }
+
     public function VerificarRol(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
