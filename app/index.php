@@ -148,6 +148,10 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/masFacturo', \VentaController::class . ':TraerMesaMasFacturo');
 
+    $group->get('/menosFacturo', \VentaController::class . ':TraerMesaMenosFacturo');
+
+    $group->get('/mayorCobro', \VentaController::class . ':TraerMesaMayorCobro');
+
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
