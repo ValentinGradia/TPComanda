@@ -234,4 +234,13 @@ class VentaController
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public static function TraerMesasPeoresReseñas($request, $response, $args)
+    {
+        $encuestas = Encuesta::where('puntaje_mesa','<',5)->get();
+
+        $payload = json_encode(array("mesas con mejor reseña" => $encuestas));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }

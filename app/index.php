@@ -156,6 +156,8 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/mejoresReseñas', \VentaController::class . ':TraerMesasMejoresReseñas');
 
+    $group->get('/peoresReseñas', \VentaController::class . ':TraerMesasPeoresReseñas');
+
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
