@@ -214,8 +214,7 @@ class PedidoController  implements IApiUsable
         $pdf = new PDF();
         $pdf->AddPage();
         
-        $pedidos = Pedido::all();
-  
+        $pedidos = Pedido::all();  
         foreach ($pedidos as $pedido) 
         {
             $pdf->ChapterTitle($pedido->codigo_pedido);

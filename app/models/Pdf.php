@@ -9,7 +9,7 @@ class PDF extends FPDF
     {
         $this->SetFont('Arial', 'B', 12);
         $this->Cell(80);
-        $this->Cell(30, 10, 'Lista Usuarios', 1, 0, 'C');
+        $this->Cell(30, 10, 'Lista', 1, 0, 'C');
         $this->Ln(20);
     }
 

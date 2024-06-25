@@ -134,7 +134,7 @@ class ProductoController implements IApiUsable
   
         foreach ($productos as $producto) {
             $pdf->ChapterTitle($producto->nombre);
-            $pdf->ChapterBody($productos->tipo . " " .  $productos->precio);
+            $pdf->ChapterBody($producto->tipo . " " .  $producto->precio);
             $pdf->Ln();
         }
   

@@ -97,9 +97,6 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 $app->get('/registros', \RegistroController::class . ':TraerTodos')->add(new UsuarioMW("admin"))
 ->add(Logger::class . ':ValidarSesion');
 
-//VALIDAR DELETE
-//verificar csv
-
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
 
