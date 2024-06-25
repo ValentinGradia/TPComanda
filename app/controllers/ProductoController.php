@@ -77,7 +77,7 @@ class ProductoController implements IApiUsable
 
     public static function DescargarCsv($request, $response, $args)
     {
-      $productos = Producto::obtenerTodos();
+      $productos = Producto::all();
       $ruta = "./Csv/productos.csv";
 
       $archivo = fopen($ruta, 'w');

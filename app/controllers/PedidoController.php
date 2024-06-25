@@ -76,7 +76,7 @@ class PedidoController  implements IApiUsable
 
     public static function DescargarCsv($request, $response, $args)
     {
-      $pedidos = Pedido::obtenerTodos();
+      $pedidos = Pedido::all();
       $ruta = "./Csv/pedidos.csv";
 
       $archivo = fopen($ruta, 'w');

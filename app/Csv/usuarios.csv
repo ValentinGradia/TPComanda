@@ -5,6 +5,5 @@ Id,nombre,clave,rol,estado,fecha_baja
 19,eugenia,$2y$10$Q2Igi6cow6KNgxdoB2ENHuhCq1D5EK0r0BUbnsQgTn9tt2RPC6rLe,mozo,activo,
 20,matias,$2y$10$QS04jghnAhMqnJ6Eu84FNuwkDHDRnJKnKaijiDjdtr7VD6GtZNiWa,cervecero,activo,
 21,ezequiel,$2y$10$D7jUR1Qnr4.38jehyzef4eSv4Mj8LnWcwF8TOI5n7Q85ba5VeBDzO,cliente,activo,
-22,pepe,$2y$10$ZF7aMO5Haeo80kh3zUmBbu1aDIffYczHXjsS1PZJfM/jUMAhlFUxS,mozo,activo,
 23,pablo,$2y$10$bCaNnAS65uGwl9Zspa0okeWzCD0QVkpnxhnRsM4swN8CDdUS1MxHy,cliente,activo,
-24,lucas,$2y$10$J3l6LPsgf8xK5ygMD6Gk.eXUbYCjZ5.QQCJfgBULM6o.ADUDylVZS,cocinero,activo,
+25,pedro,$2y$10$fWD3POExgAipN.rZTq5GRecSq09px21OJWiSYsJWQ7cqwM7Imm1uK,socio,activo,
