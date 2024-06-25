@@ -7,8 +7,9 @@ require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Venta as Venta;
 use \App\Models\Pedido as Pedido;
-use App\Models\Producto;
+use App\Models\Producto as Producto;
 use App\Models\Mesa as Mesa;
+use App\Models\Encuesta as Encuesta;
 
 use function PHPSTORM_META\map;
 
@@ -223,5 +224,14 @@ class VentaController
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
 
+    }
+
+    public static function TraerMesasMejoresReseñas($request, $response, $args)
+    {
+        $encuestas = Encuesta::where('puntaje_mesa','>',6)->get();
+
+        $payload = json_encode(array("mesas con mejor reseña" => $encuestas));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }
