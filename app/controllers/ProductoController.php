@@ -2,6 +2,7 @@
 require_once './models/Producto.php';
 require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once "./models/Pdf.php";
 
 use \App\Models\Producto as Producto;
 use \App\Models\Mesa as Mesa;
@@ -122,6 +123,31 @@ class ProductoController implements IApiUsable
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
+    }
+
+    public static function ExportarPDF($path = "./productos.pdf")
+    {
+        $pdf = new PDF();
+        $pdf->AddPage();
+        
+        $productos = Producto::all();
+  
+        foreach ($productos as $producto) {
+            $pdf->ChapterTitle($producto->nombre);
+            $pdf->ChapterBody($productos->tipo . " " .  $productos->precio);
+            $pdf->Ln();
+        }
+  
+        $pdf->Output($path, 'F');
+    }
+
+    public function DescargarPDF($request, $response, $args)
+    {
+        self::ExportarPDF();
+        $payload = json_encode(array("mensaje" => "Productos exportados a pdf con exito"));
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     }
     
     public function ModificarUno($request, $response, $args)

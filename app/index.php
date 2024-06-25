@@ -27,6 +27,7 @@ require_once "../app/middlewares/PedidoMW.php";
 require_once "../app/middlewares/Logger.php";
 require_once "../app/middlewares/AutenticadorUsuario.php";
 require_once "../app/middlewares/AutentificadorJWT.php";
+require_once './models/pdf.php';
 
 // Instantiate App
 $app = AppFactory::create(); 
@@ -65,10 +66,8 @@ use App\Models\Producto as Producto;
 use App\Models\Usuario as Usuario;
 
 // Routes
-
 $app->group("/sesion", function(RouteCollectorProxy $group){
     $group->post('[/]', \Logger::class . ':Loguear');
-    $group->get('[/]', \Logger::class.'::Salir');
 });
 
 $app->group("/usuarios", function (RouteCollectorProxy $group){
@@ -86,9 +85,13 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
 
+    $group->get('/descargarPDF', UsuarioController::class . ':DescargarPDF');
+
     $group->put('[/]', \UsuarioController::class . ':ModificarUno');
 
-})->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
+    $group->delete('[/]', \UsuarioController::class . ':BorrarUno');
+
+});//->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
 
 //descarga pdfs
 //VALIDAR DELETE 
@@ -100,12 +103,16 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->get("/csv", \ProductoController::class. ':DescargarCsv');
 
+    $group->get('/descargarPDF', ProductoController::class . ':DescargarPDF');
+
     $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
+    $group->post("/csv",\ProductoController::class . ':CargarCsv');
+
     $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("/csv",\ProductoController::class . ':CargarCsv');
+    $group->delete('[/]', \ProductoController::class . ':BorrarUno');
 
 })->add(Logger::class . ':ValidarSesion');
 
@@ -120,6 +127,8 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get('/cancelados', PedidoController::class . ':TraerCancelados')->add(new UsuarioMW('admin'));
 
+    $group->get('/descargarPDF', PedidoController::class . ':DescargarPDF');
+
     $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
 
     $group->get('/estadistica30Dias', \PedidoController::class . ':Estadisticas30Dias')->add(new UsuarioMW("socio"));
@@ -130,10 +139,12 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     ->add(MesaMW::class . ':ValidarEstadoMesa')->add(PedidoMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
 
+    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+
     $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
     ->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+    $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
 })->add(Logger::class . ':ValidarSesion');
 
@@ -160,15 +171,18 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
+    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+    
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCampos')->add(new UsuarioMW("admin"));
+
 
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->post("/csv",\PedidoController::class . ':CargarCsv');
+    $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
-});//->add(Logger::class . ':ValidarSesion');
+})->add(Logger::class . ':ValidarSesion');
 
 $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
 ->add(Logger::class . ':ValidarSesion');

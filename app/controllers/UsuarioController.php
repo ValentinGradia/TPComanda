@@ -1,6 +1,7 @@
 <?php
 require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
+require_once "./models/Pdf.php";
 
 use \App\Models\Usuario as Usuario;
 use \App\Models\Producto as Producto;
@@ -192,6 +193,31 @@ class UsuarioController implements IApiUsable
     $response->getBody()->write($payload);
     return $response
       ->withHeader('Content-Type', 'application/json');
+  }
+
+  public static function ExportarPDF($path = "./usuarios.pdf")
+  {
+      $pdf = new PDF();
+      $pdf->AddPage();
+      
+      $usuarios = Usuario::all();
+
+      foreach ($usuarios as $usuario) {
+          $pdf->ChapterTitle($usuario->nombre);
+          $pdf->ChapterBody($usuario->email . " " .  $usuario->rol . " " . $usuario->estado);
+          $pdf->Ln();
+      }
+
+      $pdf->Output($path, 'F');
+  }
+
+  public function DescargarPDF($request, $response, $args)
+  {
+      self::ExportarPDF();
+      $payload = json_encode(array("mensaje" => "Usuarios exportados a pdf con exito"));
+
+      $response->getBody()->write($payload);
+      return $response->withHeader('Content-Type', 'application/json');
   }
 
   public function ModificarUno($request, $response, $args)

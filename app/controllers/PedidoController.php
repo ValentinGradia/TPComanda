@@ -2,6 +2,7 @@
 require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once "./models/Pdf.php";
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
@@ -207,6 +208,32 @@ class PedidoController  implements IApiUsable
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
+    }
+
+    public static function ExportarPDF($path = "./pedidos.pdf")
+    {
+        $pdf = new PDF();
+        $pdf->AddPage();
+        
+        $pedidos = Pedido::all();
+  
+        foreach ($pedidos as $pedido) 
+        {
+            $pdf->ChapterTitle($pedido->codigo_pedido);
+            $pdf->ChapterBody($pedido->nombre_cliente . " " .  $pedido->codigo_mesa);
+            $pdf->Ln();
+        }
+  
+        $pdf->Output($path, 'F');
+    }
+
+    public function DescargarPDF($request, $response, $args)
+    {
+        self::ExportarPDF();
+        $payload = json_encode(array("mensaje" => "Pedidos exportados a pdf con exito"));
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     }
     
     public function ModificarUno($request, $response, $args)

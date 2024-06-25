@@ -20,7 +20,7 @@ class EncuestaController
         $puntaje_mesa = $parametros['puntaje_mesa'];
         $puntaje_restaurante = $parametros['puntaje_restaurante'];
         $puntaje_mozo = $parametros["puntaje_mozo"];
-        $puntaje_cocinero = $parametros["puntaje_cocinero"];
+        $puntaje_cocina = $parametros["puntaje_cocina"];
         $comentario = $parametros["comentario"];
         $nombre_cliente = $datos->nombre;
         $fecha_alta = date('Y-m-d H:i:s');
@@ -30,11 +30,10 @@ class EncuestaController
         $encuesta->puntaje_mesa = $puntaje_mesa;
         $encuesta->puntaje_restaurante = $puntaje_restaurante;
         $encuesta->puntaje_mozo = $puntaje_mozo;
-        $encuesta->puntaje_cocinero = $puntaje_cocinero;
+        $encuesta->puntaje_cocina = $puntaje_cocina;
         $encuesta->comentario = $comentario;
         $encuesta->nombre_cliente = $nombre_cliente;
         $encuesta->fecha_alta = $fecha_alta;
-
 
         $encuesta->save();
         $payload = json_encode(array("mensaje" => "Encuesta creada con exito"));
@@ -63,11 +62,11 @@ class EncuestaController
       foreach($encuestas as $encuesta)
       {
         $puntaje_restaurante = $encuesta->puntaje_restaurante;
-        $puntaje_cocinero = $encuesta->puntaje_cocinero;
+        $puntaje_cocina = $encuesta->puntaje_cocina;
         $puntaje_mesa = $encuesta->puntaje_mesa;
         $puntaje_mozo = $encuesta->puntaje_mozo;
 
-        $promedio = ($puntaje_cocinero + $puntaje_mesa + $puntaje_mozo + $puntaje_restaurante) / 4;
+        $promedio = ($puntaje_cocina + $puntaje_mesa + $puntaje_mozo + $puntaje_restaurante) / 4;
 
         if($promedio > 6)
         {
