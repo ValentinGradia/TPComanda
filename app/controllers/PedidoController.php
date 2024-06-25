@@ -6,6 +6,7 @@ require_once "./models/Pdf.php";
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use \App\Models\Usuario as Usuario;
 
@@ -20,7 +21,7 @@ class PedidoController  implements IApiUsable
 
         $codigo_mesa = $parametros['codigo_mesa'];
         $codigo_pedido = $parametros['codigo_pedido'];
-        $estado_pedido = $parametros["estado_pedido"];
+        $estado_pedido = 'en preparacion';
         $tiempo_inicio = date('Y-m-d H:i');
         $tiempo_estimado_entregado = $parametros["tiempo_estimado_entregado"];
         
@@ -30,7 +31,6 @@ class PedidoController  implements IApiUsable
         $usuario = Usuario::find($producto->id_cliente);
 
         $nombre_cliente = $usuario->nombre;
-
 
         $pedido = new Pedido();
         $pedido->codigo_mesa = $codigo_mesa;
@@ -111,8 +111,7 @@ class PedidoController  implements IApiUsable
 
     public static function TraerCancelados($request, $response, $args)
     {
-      $parametros = $request->getQueryParams();
-      $pedidos = Pedido::whereNotNull('fecha_baja')->get();
+      $pedidos = Pedido::withTrashed()->whereNotNull('fecha_baja')->get();
 
       $payload = json_encode(array("Pedidos cancelados: " => $pedidos));
 

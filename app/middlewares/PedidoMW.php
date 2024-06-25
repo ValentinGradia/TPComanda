@@ -7,6 +7,7 @@ use Slim\Psr7\Response as ResponseClass;
 require_once './interfaces/IApiCampos.php';
 require_once './models/Producto.php';
 require_once './models/Pedido.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
@@ -21,7 +22,7 @@ class PedidoMW implements IApiCampos
 
         $params = $request->getParsedBody();
 
-        if(isset($params["codigo_mesa"], $params["codigo_pedido"], $params["estado_pedido"]))
+        if(isset($params["codigo_mesa"], $params["codigo_pedido"]))
         {
             $response = $handler->handle($request);
         }
@@ -33,11 +34,94 @@ class PedidoMW implements IApiCampos
         return $response;
     }
 
-    public static function ValidarPedidoEnPreparacion(Request $request, RequestHandler $handler)
+    public static function ValidarPedidoCorrespondiente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getQueryParams();
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+
+        $datos = AutentificadorJWT::ObtenerData($token);
+
+        $nombre = $datos->nombre;
+
+        $pedido = Pedido::find($codigo_pedido);
+
+        if($pedido->nombre_cliente != $nombre)
+        {
+            $response->getBody()->write(json_encode(array("error" => "esa pedido no esta a tu nombre")));
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+
+    }
+
+    public static function ValidarPedidoMesaCorrespondiente(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getQueryParams();
+        $codigo_pedido = $params["codigo_pedido"];
+        $codigo_mesa = $params["codigo_mesa"];
+
+        $pedido = Pedido::find($codigo_pedido);
+
+        if($pedido->codigo_mesa != $codigo_mesa)
+        {
+            $response->getBody()->write(json_encode(array("error" => "esa pedido no esta en esa mesa")));
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+    }
+
+    public static function ValidarPedidoRepetido(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();
 
         $params = $request->getParsedBody();
+        $codigo_mesa = $params["codigo_mesa"];
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $pedido = Pedido::where('codigo_mesa', $codigo_mesa)->where('estado_pedido','en preparacion')->first();
+
+        if($pedido !== null)
+        {
+            if($pedido->codigo_pedido != $codigo_pedido)
+            {
+                $response->getBody()->write(json_encode(array("error" => "esa mesa ya tiene asignada un pedido"))); 
+            }
+            else
+            {
+                $response = $handler->handle($request);
+            }
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+
+    }
+
+    public static function ValidarPedidoEnPreparacion(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $queryParams = $request->getQueryParams();
+        $bodyParams = $request->getParsedBody();
+        $params = !empty($queryParams) ? $queryParams : $bodyParams;
 
         $codigo_pedido = $params["codigo_pedido"];
 

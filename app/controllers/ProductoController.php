@@ -32,7 +32,7 @@ class ProductoController implements IApiUsable
         $token = trim(explode("Bearer", $header)[1]);
         $datos = AutentificadorJWT::ObtenerData($token);
         $producto->id_cliente = $datos->Id_usuario;
-
+        
         $mesa = Mesa::find($codigo_mesa);
 
         if($mesa->estado_mesa == "cerrada")

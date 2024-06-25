@@ -1,8 +1,10 @@
 <?php
 require_once "./models/Mesa.php";
 require_once './interfaces/IApiUsable.php';
+require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Mesa as Mesa;
+use \App\Models\Pedido as Pedido;
 
 class MesaController implements IApiUsable
 {
@@ -47,7 +49,7 @@ class MesaController implements IApiUsable
 
     public static function DescargarCsv($request, $response, $args)
     {
-      $mesas = Mesa::obtenerTodos();
+      $mesas = Mesa::all();
       $ruta = "./Csv/mesa.csv";
 
       $archivo = fopen($ruta, 'w');
@@ -55,7 +57,7 @@ class MesaController implements IApiUsable
       fputcsv($archivo, array('codigo_mesa','estado_mesa'));
       foreach($mesas as $mesa)  
       {
-        fputcsv($archivo, array($mesa->codigo_mesa,$mesa->esado_mesa));
+        fputcsv($archivo, array($mesa->codigo_mesa,$mesa->estado_mesa));
       }
 
       fclose($archivo);
@@ -64,6 +66,21 @@ class MesaController implements IApiUsable
       return $response
         ->withHeader('Content-Type', 'application/json');
       
+    }
+
+    public static function CerrarMesa($request, $response, $args)
+    {
+      $parametros = $request->getParsedBody();
+
+      $codigo_mesa = $parametros['codigo_mesa'];
+      $mesa = Mesa::find($codigo_mesa);
+      $mesa->estado_mesa = "cerrada";
+      $mesa->save();
+
+      $payload = json_encode(array("mensaje" => "Mesa cerrada con exito"));
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
     }
 
     public function TraerUno($request, $response, $args)
@@ -103,6 +120,30 @@ class MesaController implements IApiUsable
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
+    }
+
+    public static function ClientePagando($request, $response, $args)
+    {
+      $header = $request->getHeaderLine('Authorization');
+      $token = trim(explode("Bearer", $header)[1]);
+
+      $datos = AutentificadorJWT::ObtenerData($token);
+
+      $nombre = $datos->nombre;
+
+      $pedido = Pedido::where('nombre_cliente',$nombre)->where('estado_pedido','servido')->first();
+      $codigo_mesa = $pedido->codigo_mesa;
+
+      $mesa = Mesa::find($codigo_mesa);
+      $mesa->estado_mesa = 'con cliente pagando';
+      $mesa->save();
+
+      $payload = json_encode(array("mensaje" => "Cuenta pedida"));
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'application/json');
+
     }
 
     public function BorrarUno($request, $response, $args)

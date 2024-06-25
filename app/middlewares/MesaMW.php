@@ -6,6 +6,7 @@ use Slim\Psr7\Response as ResponseClass;
 
 use \App\Models\Mesa as Mesa;
 use \App\Models\Pedido as Pedido;
+use App\Models\Producto as Producto;
 
 require_once './models/Mesa.php';
 require_once './models/Pedido.php';
@@ -28,6 +29,42 @@ class MesaMW implements IApiCampos
         }
 
         return $response;
+    }
+
+    public static function ValidarMesaOcupada(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getParsedBody();
+
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        $datos = AutentificadorJWT::ObtenerData($token);
+        $id_usuario = $datos->Id_usuario;
+
+        $codigo_mesa = $params["codigo_mesa"];
+
+        $mesa = Mesa::where('codigo_mesa',$codigo_mesa)->first();
+
+        if($mesa->estado_mesa == 'con cliente esperando pedido')
+        {
+            $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
+    
+            if($producto->id_cliente != $id_usuario)
+            {
+                $response->getBody()->write(json_encode(array("error" => "esa mesa ya esta ocupada"))); 
+            }
+            else
+            {
+                $response = $handler->handle($request);
+            }
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+
     }
 
     public static function CambiarEstadoMesa(Request $request, RequestHandler $handler)
@@ -56,7 +93,6 @@ class MesaMW implements IApiCampos
         else
         {
             //validaciones de los estados de las mesas
-
             if($rol == "mozo")
             {
                 //validar que el pedido este listo 
@@ -92,17 +128,6 @@ class MesaMW implements IApiCampos
                     $response->getBody()->write(json_encode(array("error" => "el pedido aun no esta listo")));
                 }
             }
-            else if($rol == "socio")
-            {
-                if($mesa->estado_mesa == "con cliente pagando" && $estado_mesa == "cerrada")
-                {
-                    $response = $handler->handle($request);
-                }
-                else
-                {
-                    $response->getBody()->write(json_encode(array("error" => "verifique el estado mesa ingresado"))); 
-                }
-            }
             else
             {
                 $response->getBody()->write(json_encode(array("error" => "no tiene permisos"))); 
@@ -112,6 +137,30 @@ class MesaMW implements IApiCampos
 
         return $response;
 
+    }
+
+    public static function ValidarClientePagando(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+
+        $params = $request->getParsedBody();
+        $codigo_pedido = $params["codigo_pedido"];
+
+        $pedido = Pedido::find($codigo_pedido);
+        $codigo_mesa = $pedido->codigo_mesa;
+
+        $mesa = Mesa::find($codigo_mesa);
+
+        if($mesa->estado_mesa != 'con cliente pagando')
+        {
+            $response->getBody()->write(json_encode(array("error" => "aun el cliente no pidio la cuenta"))); 
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
     }
 
     public static function ValidarEstadoMesa(Request $request, RequestHandler $handler)

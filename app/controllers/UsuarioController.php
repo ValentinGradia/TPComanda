@@ -255,6 +255,8 @@ class UsuarioController implements IApiUsable
     $id_usuario = $parametros["id_usuario"];
 
     $usuario = Usuario::find($id_usuario);
+    $usuario->estado = "inactivo";
+    $usuario->save();
 
     if($usuario !== null)
     {

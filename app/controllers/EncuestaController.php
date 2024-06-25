@@ -5,6 +5,7 @@ require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Encuesta as Encuesta;
+use \App\Models\Pedido as Pedido;
 
 class EncuestaController
 {
@@ -15,8 +16,11 @@ class EncuestaController
         $header = $request->getHeaderLine('Authorization');
         $token = trim(explode("Bearer", $header)[1]);
         $datos = AutentificadorJWT::ObtenerData($token);
+        $nombre = $datos->nombre;
+        $pedido = Pedido::where('nombre_cliente',$nombre)->first();
 
-        $codigo_mesa = $parametros["codigo_mesa"];
+        $codigo_mesa = $pedido->codigo_mesa;
+        $codigo_pedido = $pedido->codigo_pedido;
         $puntaje_mesa = $parametros['puntaje_mesa'];
         $puntaje_restaurante = $parametros['puntaje_restaurante'];
         $puntaje_mozo = $parametros["puntaje_mozo"];
@@ -27,6 +31,7 @@ class EncuestaController
 
         $encuesta = new Encuesta();
         $encuesta->codigo_mesa = $codigo_mesa;
+        $encuesta->codigo_pedido = $codigo_pedido;
         $encuesta->puntaje_mesa = $puntaje_mesa;
         $encuesta->puntaje_restaurante = $puntaje_restaurante;
         $encuesta->puntaje_mozo = $puntaje_mozo;

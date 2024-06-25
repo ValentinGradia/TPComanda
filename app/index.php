@@ -19,6 +19,7 @@ require_once "../app/controllers/PedidoController.php";
 require_once "../app/controllers/ProductoController.php";
 require_once "../app/controllers/EncuestaController.php";
 require_once "../app/controllers/VentaController.php";
+require_once "../app/controllers/RegistroController.php";
 require_once "../app/db/AccesoDatos.php";
 require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
@@ -81,20 +82,23 @@ $app->group("/usuarios", function (RouteCollectorProxy $group){
 
     $group->get('/operacionesPorSector',\UsuarioController::class . ':TraerOperacionesPorSector')->add(UsuarioMW::class . ':VerificarSector');
 
+    $group->get('/descargarPDF', UsuarioController::class . ':DescargarPDF');
+
     $group->post('[/]', \UsuarioController::class . ':CargarUno')->add(UsuarioMW::class . ':ValidarRol');
 
     $group->post("/csv",\UsuarioController::class . ':CargarCsv');
-
-    $group->get('/descargarPDF', UsuarioController::class . ':DescargarPDF');
 
     $group->put('[/]', \UsuarioController::class . ':ModificarUno');
 
     $group->delete('[/]', \UsuarioController::class . ':BorrarUno');
 
-});//->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
+})->add(new UsuarioMW("admin"))->add(Logger::class . ':ValidarSesion');
 
-//descarga pdfs
-//VALIDAR DELETE 
+$app->get('/registros', \RegistroController::class . ':TraerTodos')->add(new UsuarioMW("admin"))
+->add(Logger::class . ':ValidarSesion');
+
+//VALIDAR DELETE
+//verificar csv
 
 $app->group("/productos", function (RouteCollectorProxy $group){
     $group->get("[/]", \ProductoController::class . ":TraerTodos");
@@ -105,12 +109,13 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->get('/descargarPDF', ProductoController::class . ':DescargarPDF');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(new UsuarioMW("cliente"))
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(MesaMW::class . ':ValidarMesaOcupada')->add(new UsuarioMW("cliente"))
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->post("/csv",\ProductoController::class . ':CargarCsv');
 
-    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
+    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(ProductoMW::class . ':ValidarProductoEnPreparacion')
+    ->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
     $group->delete('[/]', \ProductoController::class . ':BorrarUno');
 
@@ -121,7 +126,9 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \PedidoController::class . ":TraerUno")->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
-    $group->get('/tiempoDemora', \PedidoController::class . ':TraerTiempoRestante')->add(new UsuarioMW("cliente"))
+    $group->get('/tiempoDemora', \PedidoController::class . ':TraerTiempoRestante')->add(PedidoMW::class . ':ValidarPedidoMesaCorrespondiente')
+    ->add(PedidoMW::class . ':ValidarPedidoCorrespondiente')
+    ->add(new UsuarioMW("cliente"))
     ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
@@ -129,16 +136,17 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get('/descargarPDF', PedidoController::class . ':DescargarPDF');
 
-    $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo');
+    $group->get('/entregadosFueraTiempoEstipulado', \PedidoController::class . ':TraerPedidosNoEntregadosATiempo')->add(new UsuarioMW("socio"));
 
     $group->get('/estadistica30Dias', \PedidoController::class . ':Estadisticas30Dias')->add(new UsuarioMW("socio"));
 
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 
     $group->post("[/]", \PedidoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarEstadoProducto')
+    ->add(PedidoMW::class . ':ValidarPedidoRepetido')
     ->add(MesaMW::class . ':ValidarEstadoMesa')->add(PedidoMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
-
+    
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
 
     $group->put("[/]", \PedidoController::class . ':ModificarUno')->add(PedidoMW::class . ':ValidarProductosListos')
@@ -153,45 +161,54 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/traer', \MesaController::class . ':TraerUno')->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
-    $group->get('/masUsada', \VentaController::class . ':TraerMesaMasUsada');
+    $group->get('/masUsada', \VentaController::class . ':TraerMesaMasUsada')->add(new UsuarioMW("socio"));
 
-    $group->get('/menosUsada', \VentaController::class . ':TraerMesaMenosUsada');
+    $group->get('/menosUsada', \VentaController::class . ':TraerMesaMenosUsada')->add(new UsuarioMW("admin"));
 
-    $group->get('/masFacturo', \VentaController::class . ':TraerMesaMasFacturo');
+    $group->get('/masFacturo', \VentaController::class . ':TraerMesaMasFacturo')->add(new UsuarioMW("admin"));
 
-    $group->get('/menosFacturo', \VentaController::class . ':TraerMesaMenosFacturo');
+    $group->get('/menosFacturo', \VentaController::class . ':TraerMesaMenosFacturo')->add(new UsuarioMW("admin"));
 
-    $group->get('/mayorCobro', \VentaController::class . ':TraerMesaMayorCobro');
+    $group->get('/mayorCobro', \VentaController::class . ':TraerMesaMayorCobro')->add(new UsuarioMW("admin"));
 
-    $group->get('/entreFechas', \VentaController::class . ':TraerMesaFacturadaEntreFechas');
+    $group->get('/menorCobro', \VentaController::class . ':TraerMesaMenorCobro')->add(new UsuarioMW("admin"));
 
-    $group->get('/mejoresReseñas', \VentaController::class . ':TraerMesasMejoresReseñas');
+    $group->get('/entreFechas', \VentaController::class . ':TraerMesaFacturadaEntreFechas')->add(new UsuarioMW("admin"));
 
-    $group->get('/peoresReseñas', \VentaController::class . ':TraerMesasPeoresReseñas');
+    $group->get('/mejoresReseñas', \VentaController::class . ':TraerMesasMejoresReseñas')->add(new UsuarioMW("admin"));
+
+    $group->get('/peoresReseñas', \VentaController::class . ':TraerMesasPeoresReseñas')->add(new UsuarioMW("admin"));
 
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
-    $group->post("/csv",\PedidoController::class . ':CargarCsv');
-    
+    $group->post("/csv",\MesaController::class . ':CargarCsv');
+
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
     ->add(MesaMW::class . ':ValidarCampos')->add(new UsuarioMW("admin"));
 
-
     $group->put("[/]", \MesaController::class . ":ModificarUno")->add(MesaMW::class . ':CambiarEstadoMesa')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(PedidoMW::class . ':ValidarCodigoNoExistente');
+
+    $group->put("/cerrar", \MesaController::class . ":CerrarMesa")->add(new UsuarioMW("socio"))
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
     $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
 })->add(Logger::class . ':ValidarSesion');
 
-$app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
+$app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(MesaMW::class . ':ValidarClientePagando')
+->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
+->add(Logger::class . ':ValidarSesion');
+
+$app->get('/pedirCuenta', MesaController::class . ':ClientePagando')
+
 ->add(Logger::class . ':ValidarSesion');
 
 $app->group("/encuesta", function (RouteCollectorProxy $group){
 
     $group->get('/mejoresReseñas', \EncuestaController::class . ':TraerMejoresReseñas')->add(new UsuarioMW('socio'));
 
-    $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'))->add(MesaMW::class . ':ValidarCodigoNoExistente');
+    $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'));
 
 })->add(Logger::class . ':ValidarSesion');
 
@@ -218,7 +235,6 @@ $app->group("/cargarFoto", function (RouteCollectorProxy $group){
         $payload = json_encode(array("mensaje" => "Foto creada con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
-
 
         
     })->add(new UsuarioMW('mozo'))

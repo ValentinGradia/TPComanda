@@ -22,9 +22,6 @@ class VentaController
 
         $pedido = Pedido::find($codigo_pedido);
         $codigo_mesa = $pedido->codigo_mesa;
-        $mesa = Mesa::find($codigo_mesa);
-        $mesa->estado_mesa = "con cliente pagando";
-        $mesa->save();
 
         $productos = ProductoController::TraerPorCodigoMesa($codigo_mesa);
 
@@ -98,23 +95,36 @@ class VentaController
             return $ventas->count();
         });
 
-        $minOcurrencias = PHP_INT_MAX;
-        $codigoMesaMenosRepetido = null;
+        $mesasQueFueronUsadas = array_keys($mesasUsos->toArray());
 
-        foreach ($mesasUsos as $codigo => $ocurrencias) 
+        $mesaNoUsada = Mesa::whereNotIn('codigo_mesa',$mesasQueFueronUsadas)->first();
+
+        if($mesaNoUsada == null)
         {
-            if ($ocurrencias < $minOcurrencias)
+
+            $minOcurrencias = PHP_INT_MAX;
+            $codigoMesaMenosRepetido = null;
+    
+            foreach ($mesasUsos as $codigo => $ocurrencias) 
             {
-                $minOcurrencias = $ocurrencias;
-                $codigoMesaMenosRepetido = $codigo;
+                if ($ocurrencias < $minOcurrencias)
+                {
+                    $minOcurrencias = $ocurrencias;
+                    $codigoMesaMenosRepetido = $codigo;
+                }
+                else if($ocurrencias == $minOcurrencias)
+                {
+                    $codigoMesaMenosRepetido = $codigoMesaMenosRepetido . ",$codigo";
+                }
             }
-            else if($ocurrencias == $minOcurrencias)
-            {
-                $codigoMesaMenosRepetido = $codigoMesaMenosRepetido . ",$codigo";
-            }
+
+            $payload = json_encode(array("Las mesas que menos se usaron fueron" => $codigoMesaMenosRepetido));
+        }
+        else
+        {
+            $payload = json_encode(array("Las mesas que menos se usaron fueron" => $mesaNoUsada));
         }
 
-        $payload = json_encode(array("Las mesas que menos se usaron fueron" => $codigoMesaMenosRepetido));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
@@ -205,9 +215,37 @@ class VentaController
                 }
             }
         }
+    }
+
+    public static function TraerMesaMenorCobro($request, $response, $args)
+    {
+        $ventas = Venta::all();
+
+        $cobrosTotal = $ventas->groupBy('codigo_mesa')->map(function($ventas){
+            return $ventas->pluck('cobro');
+        }); //pluck obtiene los valores de todos los cobros por separado
+
+        $minCobro = PHP_INT_MAX;
+        $codigo = null;
+        
+        foreach($cobrosTotal as $codigo_mesa => $cobros)
+        {
+            foreach($cobros as $cobro)
+            {
+                if($cobro < $minCobro)
+                {
+                    $minCobro = $cobro;
+                    $codigo = $codigo_mesa;
+                }
+                else if($cobro == $minCobro)
+                {
+                    $codigo = $codigo . ",$codigo_mesa";
+                }
+            }
+        }
 
 
-        $payload = json_encode(array("las mesas que tuvieron mayor importe fueron" => $codigo));
+        $payload = json_encode(array("las mesas que tuvieron menor importe fueron" => $codigo));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
@@ -239,7 +277,7 @@ class VentaController
     {
         $encuestas = Encuesta::where('puntaje_mesa','<',5)->get();
 
-        $payload = json_encode(array("mesas con mejor reseña" => $encuestas));
+        $payload = json_encode(array("mesas con peor reseña" => $encuestas));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

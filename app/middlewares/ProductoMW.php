@@ -78,6 +78,28 @@ class ProductoMW implements IApiCampos
 
     }
 
+    public static function ValidarProductoEnPreparacion(Request $request, RequestHandler $handler)
+    {
+        $response = new ResponseClass();
+        $params = $request->getParsedBody();
+
+        $id_producto = $params["id_producto"];
+        $estado_producto = $params["estado_producto"];
+
+        $producto = Producto::find($id_producto);
+
+        if($producto->estado_producto == 'pendiente' && $estado_producto == 'listo')
+        {
+            $response->getBody()->write(json_encode(array("error" => "aun el producto no esta en preparacion"))); 
+        }
+        else
+        {
+            $response = $handler->handle($request);
+        }
+
+        return $response;
+    }
+
     public static function ValidarTipo(Request $request, RequestHandler $handler)
     {
         $response = new ResponseClass();

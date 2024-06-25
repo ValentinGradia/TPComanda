@@ -37,6 +37,8 @@ class UsuarioMW
         {
             $response = $handler->handle($request);
         }
+
+        return $response;
     }
 
     public function VerificarRol(Request $request, RequestHandler $handler)
