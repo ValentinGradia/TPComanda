@@ -210,4 +210,18 @@ class VentaController
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public static function TraerMesaFacturadaEntreFechas($request, $response, $args)
+    {
+        $params = $request->getQueryParams();
+        $fechaMin = $params["fechaMin"];
+        $fechaMax = $params["fechaMax"];
+
+        $ventas = Venta::whereBetween('fecha_venta', [$fechaMin, $fechaMax])->get();
+
+        $payload = json_encode(array("facturas de mesas entre fechas dadas" => $ventas));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+
+    }
 }

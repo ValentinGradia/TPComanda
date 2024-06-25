@@ -152,6 +152,8 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->get('/mayorCobro', \VentaController::class . ':TraerMesaMayorCobro');
 
+    $group->get('/entreFechas', \VentaController::class . ':TraerMesaFacturadaEntreFechas');
+
     $group->get("/csv", \MesaController::class. ':DescargarCsv');
 
     $group->post('[/]', \MesaController::class . ":CargarUno")->add(MesaMW::class . ':ValidarCodigoExistente')
