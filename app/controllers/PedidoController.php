@@ -1,14 +1,18 @@
 <?php
 require_once './models/Pedido.php';
+require_once './models/DetallePedido.php';
 require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
 require_once "./models/Pdf.php";
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
+use \App\Models\DetallePedido as DetallePedido;
+use App\Models\Mesa;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use \App\Models\Usuario as Usuario;
+use Illuminate\Support\Arr;
 
 class PedidoController  implements IApiUsable
 {
@@ -24,13 +28,24 @@ class PedidoController  implements IApiUsable
         $estado_pedido = 'en preparacion';
         $tiempo_inicio = date('Y-m-d H:i');
         $tiempo_estimado_entregado = $parametros["tiempo_estimado_entregado"];
+
+        $json = $parametros["productos"];
+        $data = (array)json_decode($json);
+        $idProductos = $data["id_productos"];
+
+        foreach($idProductos as $id)
+        {
+          $producto = Producto::find($id);
+          $detallePedido = new DetallePedido([
+            "id_producto" => $id,
+            "codigo_pedido" => $codigo_pedido,
+            "estado_producto" => "pendiente",
+            "codigo_mesa" => $codigo_mesa,
+          ]);
+
+          $detallePedido->save();
+        }
         
-
-        $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
-
-        $usuario = Usuario::find($producto->id_cliente);
-
-        $nombre_cliente = $usuario->nombre;
 
         $pedido = new Pedido();
         $pedido->codigo_mesa = $codigo_mesa;
@@ -38,8 +53,12 @@ class PedidoController  implements IApiUsable
         $pedido->estado_pedido = $estado_pedido;
         $pedido->tiempo_inicio = $tiempo_inicio;
         $pedido->tiempo_estimado_entregado = $tiempo_estimado_entregado;
-        $pedido->nombre_cliente = $nombre_cliente;
         $pedido->id_mozo = $datos->Id_usuario;
+
+        //cambiamos el estado de la mesa
+        $mesa = Mesa::find($codigo_mesa);
+        $mesa->estado_mesa = "con cliente esperando pedido";
+        $mesa->save();
 
 
         $pedido->save();

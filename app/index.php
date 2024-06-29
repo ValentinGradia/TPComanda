@@ -116,7 +116,7 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \ProductoController::class . ':BorrarUno');
 
-})->add(Logger::class . ':ValidarSesion');
+});//->add(Logger::class . ':ValidarSesion');
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
@@ -137,10 +137,9 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->get("/csv", \PedidoController::class. ':DescargarCsv');
 
-    $group->post("[/]", \PedidoController::class . ":CargarUno")->add(ProductoMW::class . ':ValidarEstadoProducto')
-    ->add(PedidoMW::class . ':ValidarPedidoRepetido')
-    ->add(MesaMW::class . ':ValidarEstadoMesa')->add(PedidoMW::class . ':ValidarCodigoExistente')
-    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
+    $group->post("[/]", \PedidoController::class . ":CargarUno")
+    ->add(PedidoMW::class . ':ValidarPedidoRepetido')->add(PedidoMW::class . ':ValidarCodigoExistente')
+    ->add(MesaMW::class . ':ValidarCodigoNoExistente');//->add(new UsuarioMW("mozo"))->add(PedidoMW::class . ':ValidarCampos');
     
     $group->post("/csv",\PedidoController::class . ':CargarCsv');
 
@@ -149,7 +148,7 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
-})->add(Logger::class . ':ValidarSesion');
+});//->add(Logger::class . ':ValidarSesion');
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->get('[/]', \MesaController::class . ':TraerTodos')->add(new UsuarioMW("socio"));
@@ -189,7 +188,7 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
-})->add(Logger::class . ':ValidarSesion');
+});//->add(Logger::class . ':ValidarSesion');
 
 $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(MesaMW::class . ':ValidarClientePagando')
 ->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')

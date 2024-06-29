@@ -19,6 +19,6 @@ class DetallePedido extends Model //todos los modelos tienen que heredar del Mod
 
     //
     protected $fillable = [
-        'id_detalle_pedido','id_producto','codigo_pedido','tipo', 'nombre', 'precio', 'cantidad', 'estado_producto','codigo_mesa','tiempo_preparacion','id_empleado'
+        'id_detalle_pedido','id_producto','codigo_pedido','estado_producto','codigo_mesa','tiempo_preparacion','id_empleado'
     ];
 }

@@ -19,7 +19,7 @@ class Pedido extends Model //todos los modelos tienen que heredar del Model de e
 
     //
     protected $fillable = [
-        'codigo_mesa', 'estado_pedido', 'tiempo_inicio', 'tiempo_estimado_entregado', 'tiempo_entregado','nombre_cliente',
+        'codigo_mesa', 'estado_pedido', 'tiempo_inicio', 'tiempo_estimado_entregado', 'tiempo_entregado',
         'id_mozo','cobro','fecha_baja'
     ];
 }
