@@ -20,6 +20,7 @@ require_once "../app/controllers/ProductoController.php";
 require_once "../app/controllers/EncuestaController.php";
 require_once "../app/controllers/VentaController.php";
 require_once "../app/controllers/RegistroController.php";
+require_once "../app/controllers/DetallePedidoController.php";
 require_once "../app/db/AccesoDatos.php";
 require_once "../app/middlewares/UsuarioMW.php";
 require_once "../app/middlewares/MesaMW.php";
@@ -65,6 +66,7 @@ $capsule->bootEloquent();
 use \App\Models\Pedido as Pedido;
 use App\Models\Producto as Producto;
 use App\Models\Usuario as Usuario;
+use App\Models\DetallePedido as DetallePedido;
 
 // Routes
 $app->group("/sesion", function(RouteCollectorProxy $group){
@@ -111,7 +113,7 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->post("/csv",\ProductoController::class . ':CargarCsv');
 
-    $group->put("[/]", \ProductoController::class . ':ModificarUno')->add(ProductoMW::class . ':ValidarProductoEnPreparacion')
+    $group->put("[/]", \DetallePedidoController::class . ':ModificarUno')
     ->add(UsuarioMW::class . ':ValidarCambioEstadoProducto')->add(ProductoMW::class . ':ValidarCodigoNoExistente');
 
     $group->delete('[/]', \ProductoController::class . ':BorrarUno');
@@ -215,7 +217,7 @@ $app->group("/cargarFoto", function (RouteCollectorProxy $group){
         $pedido = Pedido::find($parametros["codigo_pedido"]);
         $codigo_mesa = $pedido->codigo_mesa;
 
-        $producto = Producto::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
+        $producto = DetallePedido::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
 
         $usuario = Usuario::find($producto->id_cliente);
 
