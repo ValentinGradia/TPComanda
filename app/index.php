@@ -106,7 +106,7 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->get('/descargarPDF', ProductoController::class . ':DescargarPDF');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(MesaMW::class . ':ValidarMesaOcupada')->add(new UsuarioMW("cliente"))
+    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(MesaMW::class . ':ValidarMesaOcupada')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->post("/csv",\ProductoController::class . ':CargarCsv');
@@ -124,8 +124,6 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('/traer', \PedidoController::class . ":TraerUno")->add(PedidoMW::class . ':ValidarCodigoNoExistente');
 
     $group->get('/tiempoDemora', \PedidoController::class . ':TraerTiempoRestante')->add(PedidoMW::class . ':ValidarPedidoMesaCorrespondiente')
-    ->add(PedidoMW::class . ':ValidarPedidoCorrespondiente')
-    ->add(new UsuarioMW("cliente"))
     ->add(PedidoMW::class . ':ValidarPedidoEnPreparacion')->add(PedidoMW::class . ':ValidarCodigoNoExistente')
     ->add(MesaMW::class . ':ValidarCodigoNoExistente');
 
@@ -198,7 +196,6 @@ $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(MesaMW:
 ->add(Logger::class . ':ValidarSesion');
 
 $app->get('/pedirCuenta', MesaController::class . ':ClientePagando')
-
 ->add(Logger::class . ':ValidarSesion');
 
 $app->group("/encuesta", function (RouteCollectorProxy $group){

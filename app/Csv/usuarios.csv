@@ -1,9 +1,0 @@
-Id,nombre,clave,rol,estado,fecha_baja
-1,valentin,$2y$10$m5Ggf6MODGqZV1INrxeiCOcxkajvxMIQVDMFl3HZFzf0M59PKnNu6,admin,activo,
-17,martin,$2y$10$4Mc7MfP8dRC1qNNtlfJ1TubmKey3NyfwOCaO230Dgz/IKN5R2z3/a,bartender,activo,
-18,flavio,$2y$10$X79w0CnSY7SXffaYgCRFreCQfAj9O6prtGuN8guvxlpsz6jkl115O,cocinero,activo,
-19,eugenia,$2y$10$Q2Igi6cow6KNgxdoB2ENHuhCq1D5EK0r0BUbnsQgTn9tt2RPC6rLe,mozo,activo,
-20,matias,$2y$10$QS04jghnAhMqnJ6Eu84FNuwkDHDRnJKnKaijiDjdtr7VD6GtZNiWa,cervecero,activo,
-21,ezequiel,$2y$10$D7jUR1Qnr4.38jehyzef4eSv4Mj8LnWcwF8TOI5n7Q85ba5VeBDzO,cliente,activo,
-23,pablo,$2y$10$bCaNnAS65uGwl9Zspa0okeWzCD0QVkpnxhnRsM4swN8CDdUS1MxHy,cliente,activo,
-25,pedro,$2y$10$fWD3POExgAipN.rZTq5GRecSq09px21OJWiSYsJWQ7cqwM7Imm1uK,socio,activo,

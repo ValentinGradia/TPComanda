@@ -17,29 +17,14 @@ class ProductoController implements IApiUsable
         $nombre = $parametros["nombre"];
         $precio = $parametros["precio"];
         $cantidad = $parametros["cantidad"];
-        $estado_producto = 'pendiente';
-        $codigo_mesa = $parametros["codigo_mesa"];
 
         $producto = new Producto();
-        $producto->tipo = $tipo;
         $producto->nombre = $nombre;
-        $producto->precio = $precio;
+        $producto->tipo = $tipo;
         $producto->cantidad = $cantidad;
-        $producto->estado_producto = $estado_producto;
-        $producto->codigo_mesa = $codigo_mesa;
+        $producto->precio = $precio;
 
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
-        $datos = AutentificadorJWT::ObtenerData($token);
-        $producto->id_cliente = $datos->Id_usuario;
         
-        $mesa = Mesa::find($codigo_mesa);
-
-        if($mesa->estado_mesa == "cerrada")
-        {
-          $mesa->estado_mesa = "con cliente esperando pedido";
-          $mesa->save();
-        }
 
         $producto->save();
 
@@ -56,13 +41,10 @@ class ProductoController implements IApiUsable
       while(($datos = fgetcsv($archivo)) !== false)
       {
         $producto = new Producto();
-        $producto->tipo = $datos[0];
         $producto->nombre = $datos[1];
-        $producto->precio = $datos[2];
+        $producto->tipo = $datos[0];
         $producto->cantidad = $datos[3];
-        $producto->estado_producto = $datos[4];
-        $producto->codigo_mesa = $datos[5];
-        $producto->id_empleado = $datos[6];
+        $producto->precio = $datos[2];
 
         $producto->save();
       }
@@ -82,11 +64,10 @@ class ProductoController implements IApiUsable
 
       $archivo = fopen($ruta, 'w');
 
-      fputcsv($archivo, array('Id', 'tipo', 'nombre', 'precio', 'cantidad', 'estado', 'codigo_mesa','id_empleado'));
+      fputcsv($archivo, array('Id', 'nombre', 'tipo', 'cantidad', 'precio'));
       foreach($productos as $producto)  
       {
-        fputcsv($archivo, array($producto->id_producto, $producto->tipo, $producto->nombre, $producto->precio, $producto->cantidad,
-        $producto->estado_producto,$producto->codigo_mesa, $producto->id_empleado));
+        fputcsv($archivo, array($producto->id_producto, $producto->nombre, $producto->tipo, $producto->cantidad, $producto->precio));
       }
 
       fclose($archivo);
@@ -109,11 +90,6 @@ class ProductoController implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    public static function TraerPorCodigoMesa($codigo_mesa)
-    {
-      $productos = Producto::where('codigo_mesa',$codigo_mesa)->get();
-      return $productos;
-    }
 
     public function TraerTodos($request, $response, $args)
     {
