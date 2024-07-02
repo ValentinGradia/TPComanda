@@ -1,6 +1,7 @@
 <?php
 
 require_once './models/Venta.php';
+require_once './models/DetallePedido.php';
 require_once './controllers/ProductoController.php';
 require_once './interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
@@ -8,6 +9,7 @@ require_once './middlewares/AutentificadorJWT.php';
 use \App\Models\Venta as Venta;
 use \App\Models\Pedido as Pedido;
 use App\Models\Producto as Producto;
+use App\Models\DetallePedido as DetallePedido;
 use App\Models\Mesa as Mesa;
 use App\Models\Encuesta as Encuesta;
 
@@ -23,17 +25,16 @@ class VentaController
         $pedido = Pedido::find($codigo_pedido);
         $codigo_mesa = $pedido->codigo_mesa;
 
-        $productos = ProductoController::TraerPorCodigoMesa($codigo_mesa);
+        $detallePedidos = DetallePedido::where('codigo_pedido',$codigo_pedido)->get();
 
         $cobro = 0;
 
-        
-        foreach($productos as $producto)
+        foreach($detallePedidos as $productos)
         {
+            $producto = Producto::find($productos->id_producto);
 
-            $cobro += $producto->cantidad * $producto->precio;
+            $cobro += $producto->precio * $producto->cantidad;
         }
-
 
         $pedido->cobro = $cobro;
         $pedido->save();
@@ -45,7 +46,6 @@ class VentaController
             'cobro' => $cobro,
             'fecha_venta' => date('Y-m-d H:i:s')
         ]);
-
 
         $venta->save();
 

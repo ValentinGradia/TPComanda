@@ -1,8 +1,10 @@
 <?php
 require_once './models/Usuario.php';
+require_once './models/DetallePedido.php';
 require_once './interfaces/IApiUsable.php';
 require_once "./models/Pdf.php";
 
+use App\Models\DetallePedido as DetallePedido;
 use \App\Models\Usuario as Usuario;
 use \App\Models\Producto as Producto;
 use \App\Models\Pedido as Pedido;
@@ -101,7 +103,7 @@ class UsuarioController implements IApiUsable
     $operaciones = 0;
     if($usuario->rol !== "mozo")
     {
-      $productos = Producto::where('id_empleado',$id_usuario)->get();
+      $productos = DetallePedido::where('id_empleado',$id_usuario)->get();
       $operaciones = count($productos);
     }
     else
@@ -129,7 +131,17 @@ class UsuarioController implements IApiUsable
       case "cocina":
         $productos = Producto::where('tipo','comida')->get();
 
+        $ids = array();
+
         foreach($productos as $producto)
+        {
+          
+          array_push($ids, $producto->id_producto);
+        }
+
+        $productosSector = DetallePedido::whereIn('id_producto',$ids)->get();
+
+        foreach($productosSector as $producto)
         {
           $id_empleado = $producto->id_empleado;
           if(isset($operaciones[$id_empleado]))
@@ -144,8 +156,42 @@ class UsuarioController implements IApiUsable
         break;
       case "barra":
           $productos = Producto::where('tipo','trago')->get();
-  
+
+          $ids = array();
+
+        foreach($productos as $producto)
+        {
+          
+          array_push($ids, $producto->id_producto);
+        }
+
+        $productosSector = DetallePedido::whereIn('id_producto',$ids)->get();
+
+        foreach($productosSector as $producto)
+        {
+          $id_empleado = $producto->id_empleado;
+          if(isset($operaciones[$id_empleado]))
+          {
+            $operaciones[$id_empleado]++;
+          }
+          else
+          {
+            $operaciones[$id_empleado] = 1;
+          }
+        }
+        break;
+      case "patio trasero":
+          $productos = Producto::where('tipo','cerveza')->get();
+          $ids = array();
           foreach($productos as $producto)
+          {
+            
+            array_push($ids, $producto->id_producto);
+          }
+
+          $productosSector = DetallePedido::whereIn('id_producto',$ids)->get();
+
+          foreach($productosSector as $producto)
           {
             $id_empleado = $producto->id_empleado;
             if(isset($operaciones[$id_empleado]))
@@ -158,22 +204,6 @@ class UsuarioController implements IApiUsable
             }
           }
           break;
-      case "patio trasero":
-            $productos = Producto::where('tipo','cerveza')->get();
-    
-            foreach($productos as $producto)
-            {
-              $id_empleado = $producto->id_empleado;
-              if(isset($operaciones[$id_empleado]))
-              {
-                $operaciones[$id_empleado]++;
-              }
-              else
-              {
-                $operaciones[$id_empleado] = 1;
-              }
-            }
-            break;
     }
 
     $payload = json_encode(array("Operaciones por sector (id_empleado : cantidad operaciones) " => $operaciones));

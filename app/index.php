@@ -108,8 +108,8 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->get('/descargarPDF', ProductoController::class . ':DescargarPDF');
 
-    $group->post("[/]", \ProductoController::class . ":CargarUno")->add(MesaMW::class . ':ValidarMesaOcupada')
-    ->add(MesaMW::class . ':ValidarCodigoNoExistente')->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
+    $group->post("[/]", \ProductoController::class . ":CargarUno")
+    ->add(ProductoMW::class . ':ValidarTipo')->add(ProductoMW::class . ':ValidarCampos');
 
     $group->post("/csv",\ProductoController::class . ':CargarCsv');
 
@@ -118,7 +118,7 @@ $app->group("/productos", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \ProductoController::class . ':BorrarUno');
 
-});//->add(Logger::class . ':ValidarSesion');
+})->add(Logger::class . ':ValidarSesion');
 
 $app->group("/pedidos", function (RouteCollectorProxy $group){
     $group->get('[/]', \PedidoController::class . ":TraerTodos")->add(new UsuarioMW("socio"));
@@ -150,7 +150,7 @@ $app->group("/pedidos", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
-});//->add(Logger::class . ':ValidarSesion');
+})->add(Logger::class . ':ValidarSesion');
 
 $app->group("/mesas", function (RouteCollectorProxy $group){
     $group->get('[/]', \MesaController::class . ':TraerTodos')->add(new UsuarioMW("socio"));
@@ -190,22 +190,20 @@ $app->group("/mesas", function (RouteCollectorProxy $group){
 
     $group->delete('[/]', \PedidoController::class . ':BorrarUno');
 
-});//->add(Logger::class . ':ValidarSesion');
+})->add(Logger::class . ':ValidarSesion');
 
 $app->post('/cobrarPedido', \VentaController::class . ':CargarUno')->add(MesaMW::class . ':ValidarClientePagando')
 ->add(new UsuarioMW('mozo'))->add(PedidoMW::class .':ValidarCodigoNoExistente')
 ->add(Logger::class . ':ValidarSesion');
 
-$app->get('/pedirCuenta', MesaController::class . ':ClientePagando')
-->add(Logger::class . ':ValidarSesion');
-
 $app->group("/encuesta", function (RouteCollectorProxy $group){
 
-    $group->get('/mejoresReseñas', \EncuestaController::class . ':TraerMejoresReseñas')->add(new UsuarioMW('socio'));
+    $group->get('/mejoresReseñas', \EncuestaController::class . ':TraerMejoresReseñas')->add(new UsuarioMW('socio'))
+    ->add(Logger::class . ':ValidarSesion');
 
-    $group->post('[/]', \EncuestaController::class .':CargarUno')->add(new UsuarioMW('cliente'));
+    $group->post('[/]', \EncuestaController::class .':CargarUno');
 
-})->add(Logger::class . ':ValidarSesion');
+});
 
 $app->group("/cargarFoto", function (RouteCollectorProxy $group){
     $group->post('[/]', function (Request $request, Response $response){
@@ -214,19 +212,15 @@ $app->group("/cargarFoto", function (RouteCollectorProxy $group){
 
         $parametros = $request->getParsedBody();
         $codigo_pedido = $parametros["codigo_pedido"];
+        $nombre_cliente = $parametros["nombre_cliente"];
         $pedido = Pedido::find($parametros["codigo_pedido"]);
         $codigo_mesa = $pedido->codigo_mesa;
 
-        $producto = DetallePedido::where('codigo_mesa',$codigo_mesa)->where('estado_producto','pendiente')->first();
-
-        $usuario = Usuario::find($producto->id_cliente);
-
-        $nombre_archivo = "$codigo_pedido"."-$codigo_mesa"."-$usuario->nombre";
+        $nombre_archivo = "$codigo_pedido"."-$codigo_mesa"."-$nombre_cliente";
         $ruta = "./Foto-mesas/";
 
         move_uploaded_file($archivo, $ruta . $nombre_archivo . ".png");
 
-        
         $payload = json_encode(array("mensaje" => "Foto creada con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');

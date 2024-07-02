@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DetallePedido;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as ResponseClass;
@@ -8,6 +9,7 @@ use Slim\Psr7\Response as ResponseClass;
 use \App\Models\Producto as Producto;
 
 require_once './models/Producto.php';
+require_once './models/DetallePedido.php';
 require_once './middlewares/AutentificadorJWT.php';
 
 class UsuarioMW
@@ -71,56 +73,46 @@ class UsuarioMW
         $datos = AutentificadorJWT::ObtenerData($token);
         $rol = $datos->rol;
 
+        $detallePedido = DetallePedido::where('id_producto',$params["id_producto"]);
+
         $producto = Producto::find($params["id_producto"]);
         $tipo_producto = $producto->tipo;
 
-        //validar que el producto ingresado este pendiente o en preparacion
-        if($producto->estado_producto == "pendiente" || $producto->estado_producto == "en preparacion")
+        //Dependiendo el tipo de producto ira a determinado empleado
+        switch($tipo_producto)
         {
-            //Dependiendo el tipo de producto ira a determinado empleado
-            switch($tipo_producto)
-            {
-                case "comida":
-                    if(!($rol == "cocinero"))
+            case "comida":
+                if(!($rol == "cocinero"))
+                {
+                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                }
+                else
+                {
+                    $response = $handler->handle($request);
+                }
+                break;
+            case "trago":
+                    if(!$rol == "bartender")
                     {
                         $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
                     }
                     else
                     {
-                        $producto->estado_producto = "listo";
                         $response = $handler->handle($request);
                     }
                     break;
-                case "trago":
-                        if(!$rol == "bartender")
-                        {
-                            $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
-                        }
-                        else
-                        {
-                            $producto->estado_producto = "listo";
-                            $response = $handler->handle($request);
-                        }
-                        break;
-                default:
-                    if(!$rol == "cervecero")
-                    {
-                        $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
-                    }
-                    else
-                    {
-                        $producto->estado_producto = "listo";
-                        $response = $handler->handle($request);
-                    }
-                    break;
-                
-            }
+            default:
+                if(!$rol == "cervecero")
+                {
+                    $response->getBody()->write(json_encode(array("error" => "no puedes modificar el tipo")));
+                }
+                else
+                {
+                    $response = $handler->handle($request);
+                }
+                break;
+            
         }
-        else
-        {
-            $response->getBody()->write(json_encode(array("error" => "algo salio mal...")));
-        }
-
 
 
         return $response;

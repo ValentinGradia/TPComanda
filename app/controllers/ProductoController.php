@@ -143,10 +143,6 @@ class ProductoController implements IApiUsable
           $producto->nombre = !empty($parametros["nombre"]) ? $parametros["nombre"] : $producto->nombre;
           $producto->precio = !empty($parametros["precio"]) ? $parametros["precio"] : $producto->precio;
           $producto->cantidad = !empty($parametros["cantidad"]) ? $parametros["cantidad"] : $producto->cantidad;
-          $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
-          $producto->codigo_mesa = !empty($parametros["codigo_mesa"]) ? $parametros["codigo_mesa"] : $producto->codigo_mesa;
-          $producto->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $producto->tiempo_preparacion;  
-          $producto->id_empleado = $datos->Id_usuario;
   
           $producto->save();
   

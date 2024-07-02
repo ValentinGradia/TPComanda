@@ -6,11 +6,13 @@ use Slim\Psr7\Response as ResponseClass;
 
 require_once './interfaces/IApiCampos.php';
 require_once './models/Producto.php';
+require_once './models/DetallePedido.php';
 require_once './models/Pedido.php';
 require_once './middlewares/AutentificadorJWT.php';
 
 use \App\Models\Pedido as Pedido;
 use \App\Models\Producto as Producto;
+use \App\Models\DetallePedido as DetallePedido;
 
 
 class PedidoMW implements IApiCampos
@@ -207,15 +209,14 @@ class PedidoMW implements IApiCampos
         $codigo_pedido = $params["codigo_pedido"];
 
         $pedido = Pedido::find($codigo_pedido);
-        $codigo_mesa = $pedido->codigo_mesa;
 
-        $productos = Producto::all();
+        $productos = DetallePedido::where('codigo_pedido',$params["codigo_pedido"])->get();
 
         $flag = true;
         //validar que los productos esten listos para poder servir el pedido
         foreach($productos as $producto)
         {
-            if($producto->codigo_mesa == $codigo_mesa)
+            if($producto->codigo_pedido == $codigo_pedido)
             {
                 if($producto->estado_producto !== "listo")
                 {

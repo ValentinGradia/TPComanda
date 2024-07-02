@@ -122,29 +122,6 @@ class MesaController implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    public static function ClientePagando($request, $response, $args)
-    {
-      $header = $request->getHeaderLine('Authorization');
-      $token = trim(explode("Bearer", $header)[1]);
-
-      $datos = AutentificadorJWT::ObtenerData($token);
-
-      $nombre = $datos->nombre;
-
-      $pedido = Pedido::where('nombre_cliente',$nombre)->where('estado_pedido','servido')->first();
-      $codigo_mesa = $pedido->codigo_mesa;
-
-      $mesa = Mesa::find($codigo_mesa);
-      $mesa->estado_mesa = 'con cliente pagando';
-      $mesa->save();
-
-      $payload = json_encode(array("mensaje" => "Cuenta pedida"));
-
-      $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'application/json');
-
-    }
 
     public function BorrarUno($request, $response, $args)
     {

@@ -13,20 +13,14 @@ class EncuestaController
     {
         $parametros = $request->getParsedBody();
 
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
-        $datos = AutentificadorJWT::ObtenerData($token);
-        $nombre = $datos->nombre;
-        $pedido = Pedido::where('nombre_cliente',$nombre)->first();
-
-        $codigo_mesa = $pedido->codigo_mesa;
-        $codigo_pedido = $pedido->codigo_pedido;
+        $codigo_mesa = $parametros['codigo_mesa'];
+        $codigo_pedido = $parametros['codigo_pedido'];
         $puntaje_mesa = $parametros['puntaje_mesa'];
         $puntaje_restaurante = $parametros['puntaje_restaurante'];
         $puntaje_mozo = $parametros["puntaje_mozo"];
         $puntaje_cocina = $parametros["puntaje_cocina"];
         $comentario = $parametros["comentario"];
-        $nombre_cliente = $datos->nombre;
+        $nombre_cliente = $parametros["nombre"];
         $fecha_alta = date('Y-m-d H:i:s');
 
         $encuesta = new Encuesta();

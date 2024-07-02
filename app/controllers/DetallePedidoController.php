@@ -13,20 +13,20 @@ class DetallePedidoController
     {
         $parametros = $request->getParsedBody();
 
-        $producto = Producto::find($parametros["id_producto"]);
+        $detallePedido = DetallePedido::where('id_producto',$parametros["id_producto"])->first();
 
         $header = $request->getHeaderLine('Authorization');
 
         $token = trim(explode("Bearer", $header)[1]);
         $datos = AutentificadorJWT::ObtenerData($token);
 
-        if($producto !== null)
+        if($detallePedido !== null)
         {
-            $producto->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $producto->estado_producto;
-            $producto->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $producto->tiempo_preparacion;  
-            $producto->id_empleado = $datos->Id_usuario;
+            $detallePedido->estado_producto = !empty($parametros["estado_producto"]) ? $parametros["estado_producto"] : $detallePedido->estado_producto;
+            $detallePedido->tiempo_preparacion = !empty($parametros["tiempo_preparacion"]) ? $parametros["tiempo_preparacion"] : $detallePedido->tiempo_preparacion;  
+            $detallePedido->id_empleado = $datos->Id_usuario;
 
-            $producto->save();
+            $detallePedido->save();
 
             $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
 

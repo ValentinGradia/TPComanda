@@ -23,7 +23,7 @@ class ProductoMW implements IApiCampos
 
         $params = $request->getParsedBody();
 
-        if(isset($params["tipo"], $params["nombre"], $params["precio"], $params["cantidad"],$params["codigo_mesa"])) 
+        if(isset($params["tipo"], $params["nombre"], $params["precio"], $params["cantidad"])) 
         {
             $response = $handler->handle($request);
         }

@@ -263,7 +263,6 @@ class PedidoController  implements IApiUsable
         $pedido->tiempo_inicio = !empty($parametros["tiempo_inicio"]) ? $parametros["tiempo_inicio"] : $pedido->tiempo_inicio;
         $pedido->tiempo_estimado_entregado = !empty($parametros["tiempo_estimado_entregado"]) ? $parametros["tiempo_estimado_entregado"] : $pedido->tiempo_estimado_entregado;
         $pedido->tiempo_entregado = !empty($parametros["tiempo_entregado"]) ? $parametros["tiempo_entregado"] : $pedido->tiempo_entregado;
-        $pedido->nombre_cliente = !empty($parametros["nombre_cliente"]) ? $parametros["nombre_cliente"] : $pedido->nombre_cliente;
         $pedido->cobro = !empty($parametros["cobro"]) ? $parametros["cobro"] : $pedido->cobro;
         $pedido->fecha_baja = !empty($parametros["fecha_baja"]) ? $parametros["fecha_baja"] : $pedido->fecha_baja;
         $pedido->save();
