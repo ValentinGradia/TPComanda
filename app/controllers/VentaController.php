@@ -97,14 +97,13 @@ class VentaController
 
         $mesasQueFueronUsadas = array_keys($mesasUsos->toArray());
 
-        $mesaNoUsada = Mesa::whereNotIn('codigo_mesa',$mesasQueFueronUsadas)->first();
+        $mesaNoUsada = Mesa::whereNotIn('codigo_mesa',$mesasQueFueronUsadas)->get();
 
         if($mesaNoUsada == null)
         {
-
             $minOcurrencias = PHP_INT_MAX;
             $codigoMesaMenosRepetido = null;
-    
+            
             foreach ($mesasUsos as $codigo => $ocurrencias) 
             {
                 if ($ocurrencias < $minOcurrencias)

@@ -135,7 +135,6 @@ class UsuarioController implements IApiUsable
 
         foreach($productos as $producto)
         {
-          
           array_push($ids, $producto->id_producto);
         }
 
